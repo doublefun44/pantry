@@ -226,6 +226,10 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .ml-fin.on{border-color:var(--coral);background:var(--coral);color:#fff;}
 #ml-confirm-btn:disabled{opacity:.5;cursor:default;}
 .ml-empty{text-align:center;color:var(--ink3);font-size:13px;padding:24px 0;}
+.ml-chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0;}
+.ml-chip{font-size:11.5px;padding:5px 10px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+.ml-chip.on{border-color:var(--coral);background:#FFF3ED;color:var(--coral);font-weight:600;}
+.ml-chip.combo{border-style:dashed;border-color:#B5A895;}
 /* 电池操作后行归位时的高亮闪烁 */
 .row-wrap.just-moved .row{animation:rowFlash 1.5s ease;}
 @keyframes rowFlash{0%{background:#FFEBC4;}100%{background:transparent;}}
@@ -283,6 +287,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .ring-add-btn:active{background:var(--coral);color:#fff;}
 .rcta-btn{width:100%;margin-top:8px;padding:9px;background:var(--coral);color:#fff;border:none;border-radius:var(--rsm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .rcta-btn:active{opacity:.88;}
+.rcta-cook{background:var(--green);color:#004D40;}
 .ring-all-ok{text-align:center;font-size:13px;color:#16A34A;padding:8px 0;}
 /* ── RESTOCK ── */
 .restock-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid #D1FAE5;background:#F0FDF4;color:#16A34A;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;padding:0;}
@@ -337,7 +342,9 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .ftag.f-out.on{border-color:#888;color:#444;background:#f0f0f0;}
 
 /* LIST */
-.plist{flex:1;overflow-y:auto;padding:10px 12px 80px;-webkit-overflow-scrolling:touch;}
+/* 滚动容器改为 #pantry-scroll：建议卡/横幅/列表一起滚，卡片大时也能划到下面的食材 */
+#pantry-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.plist{padding:10px 12px 80px;}
 .sec-group{background:var(--card);border-radius:var(--r);border:1px solid var(--line);overflow:hidden;margin-bottom:8px;}
 .sec-label{padding:7px 13px 5px;font-size:10px;font-weight:600;color:var(--ink3);letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:5px;border-bottom:1px solid var(--line);}
 .row{display:flex;align-items:center;padding:9px 10px 9px 0;border-bottom:1px solid var(--line);transition:background .1s;}
@@ -775,13 +782,15 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       </div>
     </div>
     <div class="frow-tags" id="filter-tags"></div>
-    <div id="suggest-card" class="suggest-card"></div>
-    <div id="expiry-alert" class="expiry-alert"></div>
-    <div id="notif-ask-bar" class="notif-ask-bar"></div>
-    <div id="backup-bar" class="backup-bar"></div>
-    <div id="dash-nudge" class="dash-nudge"></div>
-    <div id="pro-hooks"></div>
-    <div class="plist" id="plist"></div>
+    <div id="pantry-scroll">
+      <div id="suggest-card" class="suggest-card"></div>
+      <div id="expiry-alert" class="expiry-alert"></div>
+      <div id="notif-ask-bar" class="notif-ask-bar"></div>
+      <div id="backup-bar" class="backup-bar"></div>
+      <div id="dash-nudge" class="dash-nudge"></div>
+      <div id="pro-hooks"></div>
+      <div class="plist" id="plist"></div>
+    </div>
     <div class="pantry-actions">
       <button class="pa-btn" id="pa-battle-btn" onclick="showBattle()">
         <span class="pa-btn-ico">🏪</span>
@@ -880,7 +889,9 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   <div class="modal-box" style="display:flex;flex-direction:column;max-height:82vh;">
     <div class="modal-title" id="ml-title" style="margin-bottom:4px;"></div>
     <div class="modal-sub" id="ml-sub" style="margin-bottom:6px;"></div>
+    <div id="ml-combos" class="ml-chips" style="display:none;margin:0 0 8px;"></div>
     <input id="ml-search" oninput="renderMealLogList()"/>
+    <div id="ml-filters" class="ml-chips"></div>
     <div id="ml-list"></div>
     <div class="modal-btns">
       <button class="modal-cancel" id="ml-cancel-btn" onclick="closeMealLog()"></button>
@@ -1260,6 +1271,12 @@ var DICT = {
     ml_confirm:function(n){return n>0?'确认消耗（'+n+' 样）':'确认消耗';},
     ml_empty:'没有匹配的食材',
     ml_next_lv:function(lvl){return '→ '+lvl;},
+    ml_f_all:'全部', ml_f_freq:'⭐ 常用', ml_f_urg:'⏰ 临期',
+    ml_f_sel:function(n){return '✓ 已选 '+n;},
+    ml_combo:function(names,total){return '🔁 '+names+(total>2?' 等'+total+'样':'');},
+    recipe_cooked_btn:function(n){return '做好了 ✓ 按 '+n+' 人份消耗食材';},
+    ml_recipe_title:function(name){return '🍳 '+name;},
+    ml_recipe_sub:function(n){return '已按食谱（'+n+' 人份）预选库存里有的食材，可微调后确认';},
     meal_toast:function(n,f){return '已记录 '+n+' 样消耗'+(f>0?'，其中 '+f+' 样已用完移出':'');},
     stock_lv0:'🔋 满格', stock_lv1:'🔶 还剩一半', stock_lv2:'🪫 快用完',
     stock_toast:function(name,lvl){return '「'+name+'」标为 '+lvl;},
@@ -1495,6 +1512,12 @@ var DICT = {
     ml_confirm:function(n){return n>0?'Log usage ('+n+')':'Log usage';},
     ml_empty:'No matching items',
     ml_next_lv:function(lvl){return '→ '+lvl;},
+    ml_f_all:'All', ml_f_freq:'⭐ Frequent', ml_f_urg:'⏰ Expiring',
+    ml_f_sel:function(n){return '✓ Selected '+n;},
+    ml_combo:function(names,total){return '🔁 '+names+(total>2?' +'+(total-2):'');},
+    recipe_cooked_btn:function(n){return 'Cooked it ✓ consume ('+n+' servings)';},
+    ml_recipe_title:function(name){return '🍳 '+name;},
+    ml_recipe_sub:function(n){return 'Pre-selected what you have, per recipe ('+n+' servings) — adjust and confirm';},
     meal_toast:function(n,f){return 'Logged '+n+(n===1?' item':' items')+(f>0?', '+f+' used up & removed':'');},
     stock_lv0:'🔋 full', stock_lv1:'🔶 half left', stock_lv2:'🪫 almost out',
     stock_toast:function(name,lvl){return '"'+name+'" marked '+lvl;},
@@ -2097,6 +2120,83 @@ function showCookSuccess(cnt, saved, streak) {
 // 搜索 + 全库存列表（常用/临期靠前），点选即记；默认电池降一格，
 // 可切"用完了"整个移出，有数量的食材用 −/+ 调用量；确认后一次提交+可撤销
 var mealSel = {};
+var mlFilter = 'all';
+// 组合历史：每次确认消耗记住这顿的食材组合，下次一键复选
+function mealKeyOf(it) { return it.presetId ? 'p:' + it.presetId : 'n:' + (it.name || '').toLowerCase(); }
+function getMealHistory() {
+  try { return JSON.parse(localStorage.getItem('pantry_meal_history')) || []; } catch(e) { return []; }
+}
+function saveMealCombo(keys) {
+  if (keys.length < 2) return; // 单样不算组合
+  var hist = getMealHistory();
+  var sig = keys.slice().sort().join('|');
+  hist = hist.filter(function(h){ return h.sig !== sig; });
+  hist.unshift({ sig: sig, keys: keys, t: Date.now() });
+  if (hist.length > 3) hist = hist.slice(0, 3);
+  try { localStorage.setItem('pantry_meal_history', JSON.stringify(hist)); } catch(e) {}
+}
+// 组合 keys → 当前库存里能匹配上的食材（每个 key 只吃掉一个同名项）
+function comboMatchItems(keys) {
+  var res = [], used = {};
+  keys.forEach(function(k){
+    var m = items.find(function(it){ return !used[it.id] && mealKeyOf(it) === k; });
+    if (m) { used[m.id] = true; res.push(m); }
+  });
+  return res;
+}
+function renderMealCombos() {
+  var el = document.getElementById('ml-combos');
+  var chips = getMealHistory().map(function(h, i){
+    var matched = comboMatchItems(h.keys);
+    if (matched.length < 2) return '';
+    var names = matched.slice(0, 2).map(function(it){ return itemDisplayName(it); }).join(lang === 'en' ? ', ' : '、');
+    return '<button class="ml-chip combo" onclick="applyMealCombo(' + i + ')">' + txf('ml_combo', names, matched.length) + '</button>';
+  }).join('');
+  el.innerHTML = chips;
+  el.style.display = chips ? 'flex' : 'none';
+}
+function applyMealCombo(histIdx) {
+  var h = getMealHistory()[histIdx];
+  if (!h) return;
+  comboMatchItems(h.keys).forEach(function(it){
+    if (!mealSel[it.id]) {
+      mealSel[it.id] = { useQty: mealHasQty(it) ? Math.min(1, extractQtyNumber(it.qty)) : 1, finished: false };
+    }
+  });
+  mlFilter = 'sel'; // 切到"已选"视图，直观看到组合选中了什么
+  renderMealLogList();
+}
+function setMlFilter(f) { mlFilter = f; renderMealLogList(); }
+// 食谱查缺页"做好了"：把食谱匹配到的库存食材按食谱用量（2人份预设）预选进消耗弹层
+var UNIT_NORM = {'g':'g','克':'g','kg':'kg','千克':'kg','公斤':'kg','ml':'ml','毫升':'ml','l':'l','升':'l',
+                 '个':'pc','pcs':'pc','piece':'pc','颗':'pc','只':'pc','枚':'pc'};
+function normUnit(u) {
+  if (!u) return '';
+  u = String(u).trim().toLowerCase();
+  return UNIT_NORM[u] || u;
+}
+function cookRecipe(recipeId) {
+  var r = PRESET_RECIPES.find(function(x){ return x.id === recipeId; });
+  if (!r) return;
+  openMealLog();
+  checkRecipe(r).have.forEach(function(h){
+    var it = h.item;
+    if (mealSel[it.id]) return; // 两种配料匹配到同一库存项时只记一次
+    var sel = { useQty: 1, finished: false };
+    if (mealHasQty(it)) {
+      var stock = extractQtyNumber(it.qty);
+      // 单位一致（如 g/克）→ 按食谱用量预填；不一致 → 默认 1，让用户用步进器调
+      sel.useQty = (h.ing.qty && normUnit(h.ing.unit) === normUnit(it.unit))
+        ? Math.min(h.ing.qty, stock) : Math.min(1, stock);
+    }
+    mealSel[it.id] = sel;
+  });
+  mlFilter = 'sel';
+  var rName = (lang === 'en' && r.nameEn) ? r.nameEn : r.name;
+  document.getElementById('ml-title').textContent = txf('ml_recipe_title', rName);
+  document.getElementById('ml-sub').textContent = txf('ml_recipe_sub', r.servings || 2);
+  renderMealLogList();
+}
 function itemEmojiFor(it, CM) {
   if (it.photo) return '<img src="' + it.photo + '" style="width:22px;height:22px;object-fit:cover;border-radius:6px"/>';
   if (it.presetId) {
@@ -2111,12 +2211,14 @@ function mealHasQty(it) {
 }
 function openMealLog() {
   mealSel = {};
+  mlFilter = 'all';
   var si = document.getElementById('ml-search');
   si.value = '';
   si.placeholder = tx('ml_search_ph');
   document.getElementById('ml-title').textContent = tx('ml_title');
   document.getElementById('ml-sub').textContent = tx('ml_sub');
   document.getElementById('ml-cancel-btn').textContent = tx('con_cancel');
+  renderMealCombos();
   renderMealLogList();
   document.getElementById('meal-log-modal').classList.add('on');
 }
@@ -2129,9 +2231,24 @@ function renderMealLogList() {
   var CM = getCM();
   var q = (document.getElementById('ml-search').value || '').toLowerCase();
   var ord = {exp:0,urg:1,soon:2,ok:3,nd:4};
+  var isUrg = function(i){ var s = getStatus(i); return s==='exp'||s==='urg'||s==='soon'; };
   var list = items.filter(function(i){
     return i.name.toLowerCase().indexOf(q) >= 0 || (i.nameEn && i.nameEn.toLowerCase().indexOf(q) >= 0);
   });
+  // 快捷筛选芯片（计数基于搜索结果）
+  var selN = Object.keys(mealSel).length;
+  var fdefs = [
+    { id:'all',  lbl: tx('ml_f_all') },
+    { id:'freq', lbl: tx('ml_f_freq') },
+    { id:'urg',  lbl: tx('ml_f_urg') },
+    { id:'sel',  lbl: txf('ml_f_sel', selN) },
+  ];
+  document.getElementById('ml-filters').innerHTML = fdefs.map(function(f){
+    return '<button class="ml-chip' + (mlFilter===f.id?' on':'') + '" onclick="setMlFilter(\'' + f.id + '\')">' + f.lbl + '</button>';
+  }).join('');
+  if (mlFilter === 'freq')     list = list.filter(function(i){ return i.isFrequent; });
+  else if (mlFilter === 'urg') list = list.filter(isUrg);
+  else if (mlFilter === 'sel') list = list.filter(function(i){ return !!mealSel[i.id]; });
   list.sort(function(a,b){
     if (!!a.isFrequent !== !!b.isFrequent) return a.isFrequent ? -1 : 1;
     var sa = ord[getStatus(a)], sb = ord[getStatus(b)];
@@ -2177,6 +2294,9 @@ function toggleMealItem(id) {
     var it = findItem(id);
     if (!it) return;
     mealSel[id] = { useQty: mealHasQty(it) ? Math.min(1, extractQtyNumber(it.qty)) : 1, finished: false };
+    // 搜索选中后自动清空搜索词并保持焦点，直接输下一个
+    var si = document.getElementById('ml-search');
+    if (si.value) { si.value = ''; si.focus(); }
   }
   renderMealLogList();
 }
@@ -2205,12 +2325,13 @@ function updateMealLogConfirm() {
 function confirmMealLog() {
   var ids = Object.keys(mealSel).map(Number);
   if (!ids.length) { closeMealLog(); return; }
-  var changed = [], removedSnaps = [], ledgerIds = [], finCnt = 0, n = 0;
+  var changed = [], removedSnaps = [], ledgerIds = [], comboKeys = [], finCnt = 0, n = 0;
   ids.forEach(function(id){
     var idx = items.findIndex(function(i){ return i.id === id; });
     if (idx < 0) return;
     var it = items[idx], sel = mealSel[id];
     n++;
+    comboKeys.push(mealKeyOf(it));
     if (sel.finished) {
       removedSnaps.push(JSON.parse(JSON.stringify(it)));
       recordExit(it, 'use').forEach(function(x){ ledgerIds.push(x); });
@@ -2227,9 +2348,11 @@ function confirmMealLog() {
     }
   });
   mealSel = {};
+  saveMealCombo(comboKeys);
   saveItems();
   closeMealLog();
   renderPantry();
+  renderRecipes(); // 从食谱页进来时，刷新"已有/缺"状态
   showUndoToast({ mode: 'meal', changed: changed, snapshots: removedSnaps, ledgerIds: ledgerIds, count: n, finCount: finCnt });
 }
 
@@ -2782,6 +2905,9 @@ function renderRecipes() {
         bodyHtml += '<button class="rcta-btn" onclick="addMissingIngToCart(\'' + r.id + '\')">' + tx('recipe_add_missing') + '</button>';
       } else {
         bodyHtml += '<div class="ring-all-ok">&#x1F389; ' + tx('recipe_all_have') + '</div>';
+      }
+      if (check.have.length) {
+        bodyHtml += '<button class="rcta-btn rcta-cook" onclick="cookRecipe(\'' + r.id + '\')">' + txf('recipe_cooked_btn', r.servings || 2) + '</button>';
       }
       if (r.steps && r.steps.length) {
         var stepsArr = (lang === 'en' && r.stepsEn) ? r.stepsEn : r.steps;
@@ -4136,7 +4262,7 @@ function undoQuickConsume() {
     });
     undoToastCtx.snapshots.forEach(function(snap) { items.push(snap); });
     removeLedger(undoToastCtx.ledgerIds);
-    saveItems(); renderPantry();
+    saveItems(); renderPantry(); renderRecipes();
   } else {
     var it = findItem(undoToastCtx.itemId);
     if (it) {
