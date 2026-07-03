@@ -186,6 +186,56 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .pro-hook-text{flex:1;font-size:12px;color:var(--ink2);line-height:1.4;}
 .pro-hook-btn{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;background:#7C5CE0;color:#fff;}
 .pro-hook-btn:active{transform:scale(.95);}
+.suggest-card{margin:8px 12px 0;}
+.suggest-card:empty{display:none;}
+.suggest-card.has-sug{background:linear-gradient(135deg,#F1F8F2,#FDF5EF);border:1.5px solid var(--green);border-radius:var(--r);padding:13px 14px;}
+.sc-empty{font-size:12px;color:var(--ink3);text-align:center;padding:8px 4px;}
+.sc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sc-emoji{font-size:22px;}
+.sc-title{font-size:15px;font-weight:600;color:var(--ink);}
+.sc-pattern{font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.sc-note{font-weight:400;color:var(--ink2);}
+.sc-method{font-size:12px;color:var(--ink2);line-height:1.5;margin-bottom:8px;}
+.sc-seas-label{font-size:10px;font-weight:600;color:var(--ink3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;}
+.sc-seas-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.sc-seas{font-size:11px;padding:2px 8px;border-radius:10px;}
+.sc-seas.have{background:#EBF2EC;color:#2D5435;}
+.sc-seas.need{background:#FEF2F2;color:var(--coral);}
+.sc-link{display:inline-block;font-size:12px;color:var(--coral);text-decoration:none;font-weight:500;margin-bottom:10px;}
+.sc-btns{display:flex;gap:8px;}
+.sc-done{flex:1;background:var(--green);color:#fff;border:none;border-radius:var(--rsm);padding:10px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.sc-switch{flex-shrink:0;background:var(--bg);color:var(--ink2);border:1.5px solid var(--line);border-radius:var(--rsm);padding:10px 16px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.cook-item{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--line);border-radius:var(--rsm);padding:9px 12px;margin-bottom:6px;cursor:pointer;}
+.cook-item.on{background:#FFF3ED;border-color:var(--coral);}
+.cook-item.on .rs-check{background:var(--coral);border-color:var(--coral);color:#fff;}
+.cook-item-name{font-size:13px;font-weight:500;flex:1;}
+.cook-item-price{color:var(--ink3);font-size:11px;font-weight:400;}
+/* ── 做饭了批量消耗弹层 ── */
+#ml-search{width:100%;border:1.5px solid var(--line);border-radius:var(--rsm);padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);outline:none;margin-top:4px;}
+#ml-search:focus{border-color:var(--salmon);}
+#ml-list{overflow-y:auto;margin:10px 0;flex:1;min-height:0;-webkit-overflow-scrolling:touch;}
+.ml-item{padding:8px 10px;}
+.ml-emoji{font-size:18px;flex-shrink:0;line-height:1;}
+.ml-state{font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px;white-space:nowrap;}
+.ml-ctrls{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.ml-step{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--line);background:var(--card);color:var(--ink2);font-size:15px;cursor:pointer;line-height:1;font-family:'DM Sans',sans-serif;padding:0;}
+.ml-step:active{opacity:.7;}
+.ml-qty{font-size:12px;font-weight:600;min-width:34px;text-align:center;}
+.ml-eff{font-size:10px;color:var(--ink3);white-space:nowrap;}
+.ml-fin{font-size:11px;padding:4px 9px;border-radius:7px;border:1.5px solid var(--line);background:var(--card);color:var(--ink3);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.ml-fin.on{border-color:var(--coral);background:var(--coral);color:#fff;}
+#ml-confirm-btn:disabled{opacity:.5;cursor:default;}
+.ml-empty{text-align:center;color:var(--ink3);font-size:13px;padding:24px 0;}
+/* 电池操作后行归位时的高亮闪烁 */
+.row-wrap.just-moved .row{animation:rowFlash 1.5s ease;}
+@keyframes rowFlash{0%{background:#FFEBC4;}100%{background:transparent;}}
+.cook-success{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.42);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;animation:csIn .3s ease;}
+.cook-success.on{display:flex;}
+.cs-emoji{font-size:48px;margin-bottom:12px;}
+.cs-line1{font-size:18px;font-weight:600;color:#fff;margin-bottom:6px;font-family:'DM Serif Display',serif;}
+.cs-line2{font-size:15px;color:#fff;opacity:.95;margin-bottom:4px;}
+.cs-line3{font-size:14px;color:#FDE68A;margin-top:4px;}
+@keyframes csIn{from{opacity:0;}to{opacity:1;}}
 .shop-rebuy-warn{font-size:11.5px;color:#B45309;background:#FFFBEB;border:1px solid #FDE68A;border-radius:7px;padding:4px 8px;margin-top:5px;}
 .battery-tip{position:fixed;z-index:600;background:var(--ink);color:#fff;border-radius:8px;font-size:12px;padding:7px 11px;max-width:230px;line-height:1.4;box-shadow:0 4px 16px rgba(0,0,0,.22);animation:btipIn .25s ease;pointer-events:none;}
 @keyframes btipIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
@@ -725,6 +775,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       </div>
     </div>
     <div class="frow-tags" id="filter-tags"></div>
+    <div id="suggest-card" class="suggest-card"></div>
     <div id="expiry-alert" class="expiry-alert"></div>
     <div id="notif-ask-bar" class="notif-ask-bar"></div>
     <div id="backup-bar" class="backup-bar"></div>
@@ -735,6 +786,10 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       <button class="pa-btn" id="pa-battle-btn" onclick="showBattle()">
         <span class="pa-btn-ico">🏪</span>
         <span class="pa-btn-lbl" id="pa-battle-lbl"></span>
+      </button>
+      <button class="pa-btn" id="pa-cook-btn" onclick="openMealLog()">
+        <span class="pa-btn-ico">🍳</span>
+        <span class="pa-btn-lbl" id="pa-cook-lbl"></span>
       </button>
       <button class="pa-btn" id="pa-restock-btn" onclick="showRestock()">
         <span class="pa-btn-ico">📋</span>
@@ -800,6 +855,36 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     <div class="modal-btns">
       <button class="modal-cancel" id="a2hs-later-btn" onclick="dismissA2HS(false)">稍后提醒</button>
       <button class="modal-confirm" id="a2hs-got-btn" onclick="dismissA2HS(true)">知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- COOK CONFIRM MODAL（做好了 → 勾选消耗的临期食材） -->
+<div class="modal-overlay" id="cook-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="cook-modal-title" style="margin-bottom:4px;"></div>
+    <div class="modal-sub" id="cook-modal-sub"></div>
+    <div id="cook-modal-list" style="margin:12px 0;"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeCookConfirm()" id="cook-cancel-btn">取消</button>
+      <button class="modal-confirm" onclick="confirmCook()" id="cook-confirm-btn"></button>
+    </div>
+  </div>
+</div>
+
+<!-- COOK SUCCESS（成就反馈，自动消失） -->
+<div id="cook-success" class="cook-success"></div>
+
+<!-- MEAL LOG MODAL（🍳 做饭了 → 批量勾选本顿消耗的所有食材） -->
+<div class="modal-overlay" id="meal-log-modal">
+  <div class="modal-box" style="display:flex;flex-direction:column;max-height:82vh;">
+    <div class="modal-title" id="ml-title" style="margin-bottom:4px;"></div>
+    <div class="modal-sub" id="ml-sub" style="margin-bottom:6px;"></div>
+    <input id="ml-search" oninput="renderMealLogList()"/>
+    <div id="ml-list"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="ml-cancel-btn" onclick="closeMealLog()"></button>
+      <button class="modal-confirm" id="ml-confirm-btn" onclick="confirmMealLog()"></button>
     </div>
   </div>
 </div>
@@ -1167,7 +1252,19 @@ var DICT = {
     battle_checkout:function(n){return '🛒 去结算（'+n+' 件）';},
     battle_checkout_empty:'🛒 去结算',
     battle_custom_add:'＋ 添加自定义食材',
-    pa_battle:'大作战',pa_restock:'补货',pa_add:'手动添加',
+    pa_battle:'大作战',pa_restock:'补货',pa_add:'手动添加',pa_cook:'做饭了',
+    ml_title:'🍳 这顿用了什么？',
+    ml_sub:'点选用过的食材，可调用量，一次记录全部',
+    ml_search_ph:'搜索食材…',
+    ml_fin:'用完了',
+    ml_confirm:function(n){return n>0?'确认消耗（'+n+' 样）':'确认消耗';},
+    ml_empty:'没有匹配的食材',
+    ml_next_lv:function(lvl){return '→ '+lvl;},
+    meal_toast:function(n,f){return '已记录 '+n+' 样消耗'+(f>0?'，其中 '+f+' 样已用完移出':'');},
+    stock_lv0:'🔋 满格', stock_lv1:'🔶 还剩一半', stock_lv2:'🪫 快用完',
+    stock_toast:function(name,lvl){return '「'+name+'」标为 '+lvl;},
+    stock_moved_low:'，已移到「快没了」区',
+    stock_moved_back:'，已回到「其他食材」',
     rs_title_a:'日常',rs_title_b:'补货',
     rs_empty:'还没有常买食材\n在库存里点 ⭐ 标记常买',
     rs_confirm:function(n){return '✅ 确认补货（'+n+' 件）';},
@@ -1206,6 +1303,20 @@ var DICT = {
     recipe_add_one:'+ 加入清单',
     recipe_add_missing:'全部缺货加入清单',
     recipe_pro_placeholder:'🔒 自定义食谱 · 即将上线 Pro 版本',
+    recipe_expiring:function(n){return '你的'+n+'快到期了';},
+    recipe_try:'试试这样做',
+    recipe_method:'做法',
+    recipe_done:'做好了 ✓',
+    recipe_switch:'换一个',
+    recipe_detail:'详细做法 →',
+    recipe_need:'需要',
+    recipe_no_urgent:'冰箱状态良好，没有需要紧急处理的食材 😌',
+    recipe_no_match:function(n){return '有 '+n+' 样食材已临期或过期，记得尽快检查处理 👀';},
+    recipe_confirm:'确认消耗',
+    recipe_saved:function(n){return '省了约 $'+n;},
+    recipe_streak:function(n){return '连续 '+n+' 天零浪费 🎉';},
+    recipe_great:function(n){return '做得好！消耗了 '+n+' 样临期食材';},
+    recipe_seasonings:'调料',
     a2hs_title:'保护你的数据',
     a2hs_body:'安装到主屏幕后，数据永久保存在你的手机上，还能像普通 App 一样全屏使用',
     a2hs_step_pre:'点击 Safari 底部的',
@@ -1376,7 +1487,19 @@ var DICT = {
     battle_checkout:function(n){return '🛒 Checkout ('+n+(n===1?' item':' items')+')';},
     battle_checkout_empty:'🛒 Checkout',
     battle_custom_add:'+ Add custom item',
-    pa_battle:'Shop & Stock',pa_restock:'Restock',pa_add:'Add item',
+    pa_battle:'Shop & Stock',pa_restock:'Restock',pa_add:'Add item',pa_cook:'Cooked',
+    ml_title:'🍳 What did you use?',
+    ml_sub:'Tap everything you used — adjust amounts, log it all at once',
+    ml_search_ph:'Search items…',
+    ml_fin:'Used up',
+    ml_confirm:function(n){return n>0?'Log usage ('+n+')':'Log usage';},
+    ml_empty:'No matching items',
+    ml_next_lv:function(lvl){return '→ '+lvl;},
+    meal_toast:function(n,f){return 'Logged '+n+(n===1?' item':' items')+(f>0?', '+f+' used up & removed':'');},
+    stock_lv0:'🔋 full', stock_lv1:'🔶 half left', stock_lv2:'🪫 almost out',
+    stock_toast:function(name,lvl){return '"'+name+'" marked '+lvl;},
+    stock_moved_low:' — moved to “Running Low”',
+    stock_moved_back:' — back in “In Stock”',
     rs_title_a:'Restock ',rs_title_b:'List',
     rs_empty:'No frequent items yet\nTap ⭐ on any pantry item to mark it',
     rs_confirm:function(n){return '✅ Restock ('+n+(n===1?' item':' items')+')';},
@@ -1415,6 +1538,20 @@ var DICT = {
     recipe_add_one:'+ Add to list',
     recipe_add_missing:'Add missing to list',
     recipe_pro_placeholder:'🔒 Custom recipes · Coming in Pro',
+    recipe_expiring:function(n){return 'Your '+n+' is expiring soon';},
+    recipe_try:'Try this',
+    recipe_method:'How to',
+    recipe_done:'Done cooking ✓',
+    recipe_switch:'Try another',
+    recipe_detail:'Full recipe →',
+    recipe_need:'Need',
+    recipe_no_urgent:'Fridge is looking good, nothing urgent 😌',
+    recipe_no_match:function(n){return n + (n===1?' item is':' items are') + ' expiring or expired — check them soon 👀';},
+    recipe_confirm:'Confirm used',
+    recipe_saved:function(n){return 'Saved ~$'+n;},
+    recipe_streak:function(n){return n+' day zero-waste streak 🎉';},
+    recipe_great:function(n){return 'Nice! Used up '+n+' expiring items';},
+    recipe_seasonings:'Seasonings',
     a2hs_title:'Keep your data safe',
     a2hs_body:'Install Funtry to your home screen — your data stays on your phone for good, and it works full-screen like a regular app',
     a2hs_step_pre:'Tap the Share button',
@@ -1582,6 +1719,7 @@ function applyLang() {
   var pbl = document.getElementById('pa-battle-lbl');  if (pbl)  pbl.textContent  = tx('pa_battle');
   var prl = document.getElementById('pa-restock-lbl'); if (prl)  prl.textContent  = tx('pa_restock');
   var pal = document.getElementById('pa-add-lbl');     if (pal)  pal.textContent  = tx('pa_add');
+  var pcl = document.getElementById('pa-cook-lbl');    if (pcl)  pcl.textContent  = tx('pa_cook');
   // battle modal
   var battleModal = document.getElementById('battle-modal');
   if (battleModal && battleModal.classList.contains('on')) renderBattle();
@@ -1687,7 +1825,413 @@ var PRESET_PANTRY = [
   {id:'walnuts',         name:{zh:'核桃',      en:'Walnuts'},         category:'snack',   displayCat:'snack',     behaviorCat:'longtail', defaultShelfDays:90,  defaultPrice:7.00, emoji:'🌰'},
   {id:'pistachios',      name:{zh:'开心果',    en:'Pistachios'},      category:'snack',   displayCat:'snack',     behaviorCat:'longtail', defaultShelfDays:90,  defaultPrice:8.00, emoji:'🌰'},
   {id:'pine-nuts',       name:{zh:'松子',      en:'Pine Nuts'},       category:'snack',   displayCat:'snack',     behaviorCat:'longtail', defaultShelfDays:60,  defaultPrice:9.00, emoji:'🌰'},
+  // ── v3 新增：高浪费果蔬 + 常用调料 ──
+  {id:'carrot',          name:{zh:'胡萝卜',    en:'Carrot'},          category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:21,  defaultPrice:2.00, emoji:'🥕'},
+  {id:'celery',          name:{zh:'芹菜',      en:'Celery'},          category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:14,  defaultPrice:2.50, emoji:'🌿'},
+  {id:'potato',          name:{zh:'土豆',      en:'Potato'},          category:'veg',     displayCat:'fresh',     behaviorCat:'longtail', defaultShelfDays:21,  defaultPrice:3.00, emoji:'🥔'},
+  {id:'cauliflower',     name:{zh:'花菜',      en:'Cauliflower'},     category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:7,   defaultPrice:3.00, emoji:'🥦'},
+  {id:'sweet-potato',    name:{zh:'红薯',      en:'Sweet Potato'},    category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:21,  defaultPrice:2.50, emoji:'🍠'},
+  {id:'cabbage',         name:{zh:'卷心菜',    en:'Cabbage'},         category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:14,  defaultPrice:2.00, emoji:'🥬'},
+  {id:'avocado',         name:{zh:'牛油果',    en:'Avocado'},         category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:5,   defaultPrice:2.00, emoji:'🥑'},
+  {id:'mushroom',        name:{zh:'蘑菇',      en:'Mushroom'},        category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:7,   defaultPrice:3.00, emoji:'🍄'},
+  {id:'banana',          name:{zh:'香蕉',      en:'Banana'},          category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:5,   defaultPrice:1.50, emoji:'🍌'},
+  {id:'apple',           name:{zh:'苹果',      en:'Apple'},           category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:21,  defaultPrice:4.00, emoji:'🍎'},
+  {id:'bread',           name:{zh:'面包',      en:'Bread'},           category:'dry',     displayCat:'dry',       behaviorCat:'fresh',    defaultShelfDays:5,   defaultPrice:4.00, emoji:'🍞'},
+  {id:'chicken-thigh',   name:{zh:'鸡腿肉',    en:'Chicken Thigh'},   category:'meat',    displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:3,   defaultPrice:6.00, frozenShelfDays:180, emoji:'🍗'},
+  {id:'tofu',            name:{zh:'豆腐',      en:'Firm Tofu'},       category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:7,   defaultPrice:2.50, emoji:'🧈'},
+  {id:'beet',            name:{zh:'甜菜',      en:'Beet'},            category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:14,  defaultPrice:3.00, emoji:'🟣'},
+  {id:'paprika',         name:{zh:'甜椒粉',    en:'Paprika'},         category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:3.00, emoji:'🌶️'},
+  {id:'oyster-sauce',    name:{zh:'蚝油',      en:'Oyster Sauce'},    category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:3.50, emoji:'🫙'},
+  {id:'rice-vinegar',    name:{zh:'米醋',      en:'Rice Vinegar'},    category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:3.00, emoji:'🫙'},
+  {id:'sugar',           name:{zh:'白糖',      en:'Sugar'},           category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:2.00, emoji:'🧂'},
+  {id:'chili-flakes',    name:{zh:'辣椒粉',    en:'Chili Flakes'},    category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:2.50, emoji:'🌶️'},
+  {id:'mirin',           name:{zh:'味淋',      en:'Mirin'},           category:'sauce',   displayCat:'seasoning', behaviorCat:'longtail', defaultShelfDays:365, defaultPrice:4.00, emoji:'🍶'},
+  {id:'dashi',           name:{zh:'高汤粉',    en:'Dashi Powder'},    category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:5.00, emoji:'🍲'},
+  {id:'curry-roux',      name:{zh:'咖喱块',    en:'Curry Roux'},      category:'sauce',   displayCat:'seasoning', behaviorCat:'longtail', defaultShelfDays:365, defaultPrice:4.00, emoji:'🍛'},
+  {id:'soy-sauce',       name:{zh:'酱油',      en:'Soy Sauce'},       category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:3.50, emoji:'🫙'},
+  {id:'sesame-oil',      name:{zh:'麻油',      en:'Sesame Oil'},      category:'sauce',   displayCat:'seasoning', behaviorCat:'staple',                         defaultPrice:4.00, emoji:'🫙'},
 ];
+
+// ── v3 临期食材点餐：13 个烹饪模式 ──
+var COOKING_PATTERNS = [
+  {patternId:"med-roast", name:{zh:"地中海烤蔬菜",en:"Mediterranean roast"}, method:{zh:"切块，拌橄榄油+盐+黑胡椒+甜椒粉，400°F 烤 30 分钟，中间翻面",en:"Cut into chunks, toss with olive oil + salt + pepper + paprika, roast at 400°F for 30 min, flip halfway"}, minutes:35, baseSeasonings:["olive-oil","salt","black-pepper","paprika"], optionalSeasonings:["dried-oregano","dried-thyme","garlic","honey"], searchQuery:{zh:"地中海烤蔬菜",en:"Mediterranean roasted vegetables"}},
+  {patternId:"oil-tofu", name:{zh:"泼油豆腐",en:"Hot oil tofu"}, method:{zh:"豆腐水煮 3 分钟沥干；蚝油+酱油+盐+米醋+糖调汁；撒蒜末、辣椒粉、香菜，泼热油后拌入调味汁",en:"Boil tofu 3 min, drain. Mix oyster sauce + soy sauce + salt + vinegar + sugar. Top with garlic, chili flakes, cilantro, pour hot oil, mix in sauce"}, minutes:10, baseSeasonings:["oyster-sauce","soy-sauce","salt","rice-vinegar","sugar","garlic","chili-flakes","cilantro"], optionalSeasonings:["sesame-oil","scallions"], searchQuery:{zh:"泼油豆腐",en:"hot oil tofu Chinese style"}},
+  {patternId:"salad", name:{zh:"沙拉碗",en:"Salad bowl"}, method:{zh:"蔬菜洗净切好，加甜菜/坚果等配料，淋油醋汁或蜂蜜芥末",en:"Wash and chop greens, add beets/nuts/toppings, drizzle with glaze or vinaigrette"}, minutes:10, baseSeasonings:["olive-oil","salt"], optionalSeasonings:["red-wine-vinegar","lemon","honey","dijon-mustard","feta-cheese"], searchQuery:{zh:"地中海沙拉",en:"Mediterranean salad"}},
+  {patternId:"oil-preserved", name:{zh:"油浸蔬菜",en:"Oil-preserved vegetables"}, method:{zh:"蔬菜切块，橄榄油慢煮或烤至软，加蒜和香草，密封冷藏可存一周",en:"Cut veggies, slow cook or roast in olive oil until soft, add garlic and herbs, seal and refrigerate for up to a week"}, minutes:40, triggerQty:3, baseSeasonings:["olive-oil","garlic","salt"], optionalSeasonings:["dried-oregano","dried-basil","dried-thyme","black-pepper"], searchQuery:{zh:"油浸蔬菜 意式",en:"Italian preserved vegetables in olive oil"}},
+  {patternId:"curry", name:{zh:"日式咖喱",en:"Japanese curry"}, method:{zh:"蔬菜切块炒软，加水煮，放咖喱块融化，浇饭",en:"Cut veggies, sauté until soft, add water and simmer, melt curry roux, serve over rice"}, minutes:35, baseSeasonings:["curry-roux"], optionalSeasonings:["soy-sauce","honey"], searchQuery:{zh:"日式咖喱饭",en:"Japanese curry rice"}},
+  {patternId:"soup", name:{zh:"一锅炖汤",en:"One-pot soup"}, method:{zh:"蔬菜切块，洋葱蒜炒香，加水或高汤煮 20 分钟，可打泥可不打",en:"Chop veggies, sauté onion and garlic, add water or broth, simmer 20 min, blend or leave chunky"}, minutes:30, baseSeasonings:["onion","garlic","olive-oil","salt"], optionalSeasonings:["black-pepper","lemon","butter"], searchQuery:{zh:"蔬菜浓汤",en:"vegetable soup"}},
+  {patternId:"stir-fry", name:{zh:"快炒",en:"Quick stir-fry"}, method:{zh:"大火热油，蒜姜炝锅，食材翻炒 2-3 分钟，调味出锅",en:"High heat, oil, garlic and ginger, stir-fry 2-3 min, season and serve"}, minutes:10, baseSeasonings:["garlic","salt","olive-oil"], optionalSeasonings:["soy-sauce","ginger","sesame-oil","scallions"], searchQuery:{zh:"快手炒菜",en:"quick stir fry vegetables"}},
+  {patternId:"egg-combo", name:{zh:"蛋炒",en:"Egg combo"}, method:{zh:"食材切碎，和打散的鸡蛋混合，煎或炒",en:"Chop ingredients, mix with beaten eggs, pan-fry or scramble"}, minutes:10, baseSeasonings:["salt","olive-oil"], optionalSeasonings:["black-pepper","scallions"], searchQuery:{zh:"蔬菜炒蛋",en:"vegetable egg scramble"}},
+  {patternId:"dip-snack", name:{zh:"蘸酱零食",en:"Dip & snack"}, method:{zh:"蔬菜切条，配 hummus/酸奶酱/芝麻酱直接吃",en:"Cut into sticks, eat with hummus, yogurt dip, or tahini"}, minutes:5, baseSeasonings:[], optionalSeasonings:["tahini","greek-yogurt","lemon"], searchQuery:{zh:"蔬菜蘸酱",en:"vegetable sticks and hummus"}},
+  {patternId:"fried-rice", name:{zh:"炒饭",en:"Fried rice"}, method:{zh:"剩饭+蛋+蔬菜碎大火翻炒，万能剩菜法",en:"Leftover rice + egg + diced veggies, stir-fry on high heat, universal leftover cleaner"}, minutes:10, baseSeasonings:["salt","egg","scallions"], optionalSeasonings:["soy-sauce","sesame-oil","garlic"], searchQuery:{zh:"蛋炒饭",en:"fried rice"}},
+  {patternId:"teriyaki", name:{zh:"照烧",en:"Teriyaki"}, method:{zh:"味淋+酱油 1:1 混合，煎肉至两面焦，倒入酱汁收浓",en:"Mix mirin + soy sauce 1:1, pan-fry meat until browned, pour sauce and reduce"}, minutes:15, baseSeasonings:["mirin","soy-sauce"], optionalSeasonings:["garlic","ginger"], searchQuery:{zh:"照烧鸡腿",en:"teriyaki chicken"}},
+  {patternId:"smoothie", name:{zh:"冰沙/奶昔",en:"Smoothie"}, method:{zh:"水果+牛奶或酸奶打成冰沙",en:"Blend fruit + milk or yogurt into smoothie"}, minutes:5, baseSeasonings:[], optionalSeasonings:["honey","milk","greek-yogurt","oats"], searchQuery:{zh:"水果冰沙",en:"fruit smoothie"}},
+  {patternId:"toast", name:{zh:"吐司/三明治",en:"Toast / sandwich"}, method:{zh:"面包烤脆，加喜欢的配料",en:"Toast bread, add toppings"}, minutes:5, baseSeasonings:["salt"], optionalSeasonings:["olive-oil","black-pepper","lemon"], searchQuery:{zh:"牛油果吐司",en:"avocado toast"}}
+];
+
+// ── v3 临期食材点餐：25 个高浪费食材 → 模式方案（按 wasteRank 排） ──
+var INGREDIENT_PLANS = [
+  {ingredientId:"carrot", wasteRank:1, whyWasted:{zh:"美超大袋装，一袋 2 磅根本吃不完",en:"Sold in 2lb bags, way too much to finish"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"胡萝卜条是最容易的烤法",en:"Carrot sticks are the easiest roast"}},{patternId:"dip-snack",priority:2,note:{zh:"切条蘸 hummus 当零食",en:"Cut into sticks, dip in hummus as snack"}},{patternId:"curry",priority:3,note:{zh:"咖喱必备，一次消耗大量",en:"Curry essential, uses up a lot at once"}},{patternId:"soup",priority:4,note:{zh:"胡萝卜浓汤，打泥丝滑",en:"Carrot soup, blend until silky"}},{patternId:"fried-rice",priority:5,note:{zh:"切碎丢炒饭里",en:"Dice and toss into fried rice"}},{patternId:"stir-fry",priority:6,note:{zh:"切丝快炒",en:"Julienne and stir-fry"}}]},
+  {ingredientId:"lettuce", wasteRank:2, whyWasted:{zh:"叶菜保质期最短，一大包很难几天吃完",en:"Very short shelf life, big bags go bad fast"}, patterns:[{patternId:"salad",priority:1,note:{zh:"最直接的用法",en:"Most direct use"}},{patternId:"toast",priority:2,note:{zh:"三明治/卷饼里加生菜",en:"Add to sandwiches or wraps"}}]},
+  {ingredientId:"tomato", wasteRank:3, whyWasted:{zh:"多个一起熟，来不及吃",en:"Multiple ripen at once, can't eat fast enough"}, patterns:[{patternId:"oil-preserved",priority:1,note:{zh:"3 个以上就可以做油浸番茄",en:"3+ tomatoes? Make oil-preserved tomatoes"},triggerQty:3},{patternId:"salad",priority:2,note:{zh:"切块加沙拉",en:"Dice into salads"}},{patternId:"egg-combo",priority:3,note:{zh:"番茄炒蛋，经典",en:"Tomato egg stir-fry, classic"},specificName:{zh:"番茄炒蛋",en:"Tomato egg stir-fry"},searchQuery:{zh:"番茄炒蛋",en:"tomato egg stir fry"}},{patternId:"soup",priority:4,note:{zh:"番茄汤",en:"Tomato soup"},searchQuery:{zh:"番茄浓汤",en:"tomato soup"}}]},
+  {ingredientId:"bell-pepper", wasteRank:4, whyWasted:{zh:"多只装，颜色好看但太多",en:"Sold in multi-packs, colorful but too many"}, patterns:[{patternId:"oil-preserved",priority:1,note:{zh:"3 个以上油浸彩椒",en:"3+ peppers? Oil-preserve them"},triggerQty:3},{patternId:"med-roast",priority:2,note:{zh:"切块和其他蔬菜一起烤",en:"Chop and roast with other veggies"}},{patternId:"stir-fry",priority:3,note:{zh:"彩椒炒肉",en:"Stir-fry with meat"}},{patternId:"salad",priority:4,note:{zh:"切丝加沙拉增色",en:"Slice into salad for color"}}]},
+  {ingredientId:"potato", wasteRank:5, whyWasted:{zh:"大袋装，发芽前用不完",en:"Big bags, sprout before you can finish"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤土豆块，外脆内软",en:"Roasted potato chunks, crispy outside"}},{patternId:"curry",priority:2,note:{zh:"土豆咖喱，经典搭配",en:"Potato curry, classic combo"}},{patternId:"soup",priority:3,note:{zh:"土豆浓汤",en:"Potato soup"}}]},
+  {ingredientId:"cauliflower", wasteRank:6, whyWasted:{zh:"一整颗很大，一两顿吃不完",en:"Whole head is big, can't finish in 1-2 meals"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤花菜是最佳做法",en:"Roasted cauliflower is the best way"}},{patternId:"curry",priority:2,note:{zh:"花菜咖喱",en:"Cauliflower curry"}},{patternId:"stir-fry",priority:3,note:{zh:"蒜炒花菜",en:"Garlic stir-fried cauliflower"}}]},
+  {ingredientId:"broccoli", wasteRank:7, whyWasted:{zh:"花头容易发黄",en:"Florets turn yellow quickly"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤西兰花，焦边最好吃",en:"Roasted broccoli, charred edges are the best"}},{patternId:"stir-fry",priority:2,note:{zh:"蒜蓉西兰花",en:"Garlic broccoli"}},{patternId:"curry",priority:3,note:{zh:"扔进咖喱里",en:"Toss into curry"}}]},
+  {ingredientId:"celery", wasteRank:8, whyWasted:{zh:"一整把，只用几根剩下的就放坏了",en:"Whole bunch, use a few stalks and the rest goes bad"}, patterns:[{patternId:"dip-snack",priority:1,note:{zh:"切条蘸花生酱或 hummus",en:"Sticks with peanut butter or hummus"}},{patternId:"soup",priority:2,note:{zh:"芹菜是各种汤的基底",en:"Celery is a base for all kinds of soups"}},{patternId:"stir-fry",priority:3,note:{zh:"芹菜炒肉",en:"Stir-fry with meat"}},{patternId:"fried-rice",priority:4,note:{zh:"切碎丢炒饭",en:"Dice into fried rice"}}]},
+  {ingredientId:"avocado", wasteRank:9, whyWasted:{zh:"熟了窗口就 1-2 天",en:"Ripe window is only 1-2 days"}, patterns:[{patternId:"toast",priority:1,note:{zh:"牛油果吐司，加盐和柠檬汁",en:"Avocado toast, add salt and lemon"},specificName:{zh:"牛油果吐司",en:"Avocado toast"},searchQuery:{zh:"牛油果吐司",en:"avocado toast"}},{patternId:"salad",priority:2,note:{zh:"切块加任何沙拉",en:"Cube into any salad"}}]},
+  {ingredientId:"banana", wasteRank:10, whyWasted:{zh:"一串同时熟，来不及吃就全变黑",en:"Whole bunch ripens at once, all go brown together"}, patterns:[{patternId:"smoothie",priority:1,note:{zh:"过熟香蕉做冰沙最甜",en:"Overripe bananas make the sweetest smoothies"}},{patternId:"toast",priority:2,note:{zh:"香蕉花生酱吐司",en:"Banana peanut butter toast"}}]},
+  {ingredientId:"bread", wasteRank:11, whyWasted:{zh:"几天就发霉，一人吃不完一条",en:"Molds in days, one person can't finish a loaf"}, patterns:[{patternId:"toast",priority:1,note:{zh:"各种吐司：牛油果、鸡蛋、奶酪",en:"All kinds of toast: avocado, egg, cheese"}}]},
+  {ingredientId:"chicken-breast", wasteRank:12, whyWasted:{zh:"冷藏只能放 3 天",en:"Only 3 days in fridge"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤鸡胸配蔬菜",en:"Roasted chicken breast with veggies"},searchQuery:{zh:"烤鸡胸",en:"baked chicken breast"}},{patternId:"stir-fry",priority:2,note:{zh:"鸡胸炒蔬菜",en:"Chicken stir-fry with veggies"}},{patternId:"salad",priority:3,note:{zh:"煎鸡胸切片加沙拉",en:"Pan-sear, slice, add to salad"}}]},
+  {ingredientId:"chicken-thigh", wasteRank:13, whyWasted:{zh:"冷藏只能放 3 天",en:"Only 3 days in fridge"}, patterns:[{patternId:"teriyaki",priority:1,note:{zh:"照烧鸡腿，最佳搭配",en:"Teriyaki chicken thigh, perfect match"}},{patternId:"curry",priority:2,note:{zh:"咖喱鸡",en:"Chicken curry"}},{patternId:"med-roast",priority:3,note:{zh:"烤鸡腿",en:"Roasted chicken thigh"}}]},
+  {ingredientId:"salmon", wasteRank:14, whyWasted:{zh:"冷藏只能放 2 天",en:"Only 2 days in fridge"}, patterns:[{patternId:"teriyaki",priority:1,note:{zh:"味淋酱油煎三文鱼",en:"Mirin soy sauce pan-seared salmon"},specificName:{zh:"照烧三文鱼",en:"Teriyaki salmon"}},{patternId:"med-roast",priority:2,note:{zh:"柠檬烤三文鱼",en:"Lemon roasted salmon"},searchQuery:{zh:"柠檬烤三文鱼",en:"lemon baked salmon"}}]},
+  {ingredientId:"tofu", wasteRank:15, whyWasted:{zh:"开封后几天就不新鲜",en:"Goes bad a few days after opening"}, patterns:[{patternId:"oil-tofu",priority:1,note:{zh:"泼油豆腐，你的招牌菜",en:"Hot oil tofu, your signature dish"}},{patternId:"curry",priority:2,note:{zh:"豆腐咖喱",en:"Tofu curry"}},{patternId:"stir-fry",priority:3,note:{zh:"煎豆腐配蔬菜",en:"Pan-fried tofu with veggies"}}]},
+  {ingredientId:"mushroom", wasteRank:16, whyWasted:{zh:"容易发黑变滑",en:"Gets slimy and dark quickly"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤蘑菇",en:"Roasted mushrooms"}},{patternId:"stir-fry",priority:2,note:{zh:"蒜炒蘑菇",en:"Garlic stir-fried mushrooms"}},{patternId:"egg-combo",priority:3,note:{zh:"蘑菇炒蛋",en:"Mushroom scrambled eggs"}},{patternId:"soup",priority:4,note:{zh:"蘑菇汤",en:"Mushroom soup"}}]},
+  {ingredientId:"zucchini", wasteRank:17, whyWasted:{zh:"变软很快",en:"Gets soft quickly"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤西葫芦",en:"Roasted zucchini"}},{patternId:"stir-fry",priority:2,note:{zh:"切片炒",en:"Slice and stir-fry"}}]},
+  {ingredientId:"eggplant", wasteRank:18, whyWasted:{zh:"表面起皱就不好了",en:"Wrinkles on skin mean it's going bad"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤茄子",en:"Roasted eggplant"}},{patternId:"stir-fry",priority:2,note:{zh:"蒜炒茄子",en:"Garlic eggplant stir-fry"}}]},
+  {ingredientId:"sweet-potato", wasteRank:19, whyWasted:{zh:"放久会发芽变软",en:"Sprouts and softens over time"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"烤红薯块",en:"Roasted sweet potato chunks"}},{patternId:"curry",priority:2,note:{zh:"红薯咖喱",en:"Sweet potato curry"}},{patternId:"soup",priority:3,note:{zh:"红薯浓汤",en:"Sweet potato soup"}}]},
+  {ingredientId:"milk", wasteRank:20, whyWasted:{zh:"日期标签混淆，加上喝不完",en:"Date label confusion plus can't finish"}, patterns:[{patternId:"smoothie",priority:1,note:{zh:"做冰沙的基底",en:"Smoothie base"}}]},
+  {ingredientId:"egg", wasteRank:21, whyWasted:{zh:"一盒 12 个，用不完",en:"Carton of 12, can't use them all"}, patterns:[{patternId:"egg-combo",priority:1,note:{zh:"和任何蔬菜炒",en:"Scramble with any vegetable"}},{patternId:"fried-rice",priority:2,note:{zh:"蛋炒饭",en:"Egg fried rice"}},{patternId:"toast",priority:3,note:{zh:"煎蛋吐司",en:"Fried egg on toast"}}]},
+  {ingredientId:"spinach", wasteRank:22, whyWasted:{zh:"大包装，几天就蔫了",en:"Big bag, wilts in days"}, patterns:[{patternId:"egg-combo",priority:1,note:{zh:"菠菜炒蛋",en:"Spinach scrambled eggs"}},{patternId:"smoothie",priority:2,note:{zh:"扔进冰沙里，吃不出来",en:"Toss in smoothie, can't taste it"}},{patternId:"salad",priority:3,note:{zh:"生菠菜沙拉",en:"Raw spinach salad"}}]},
+  {ingredientId:"shrimp", wasteRank:23, whyWasted:{zh:"冷藏只能放 2 天",en:"Only 2 days in fridge"}, patterns:[{patternId:"stir-fry",priority:1,note:{zh:"蒜蓉虾",en:"Garlic shrimp"},specificName:{zh:"蒜蓉黄油虾",en:"Garlic butter shrimp"},searchQuery:{zh:"蒜蓉黄油虾",en:"garlic butter shrimp"}},{patternId:"curry",priority:2,note:{zh:"虾咖喱",en:"Shrimp curry"}}]},
+  {ingredientId:"beef", wasteRank:24, whyWasted:{zh:"冷藏只能放 3 天",en:"Only 3 days in fridge"}, patterns:[{patternId:"stir-fry",priority:1,note:{zh:"彩椒炒牛肉",en:"Beef and bell pepper stir-fry"}},{patternId:"teriyaki",priority:2,note:{zh:"日式牛丼饭",en:"Gyudon beef bowl"},specificName:{zh:"日式牛丼饭",en:"Gyudon"},searchQuery:{zh:"日式牛丼饭 牛丼",en:"gyudon beef bowl"}},{patternId:"curry",priority:3,note:{zh:"牛肉咖喱",en:"Beef curry"}}]},
+  {ingredientId:"lamb", wasteRank:25, whyWasted:{zh:"冷藏只能放 3 天",en:"Only 3 days in fridge"}, patterns:[{patternId:"med-roast",priority:1,note:{zh:"地中海香草烤羊肉",en:"Mediterranean herb roasted lamb"},searchQuery:{zh:"香草烤羊排",en:"herb roasted lamb"}},{patternId:"stir-fry",priority:2,note:{zh:"孜然炒羊肉",en:"Cumin lamb stir-fry"},specificName:{zh:"孜然羊肉",en:"Cumin lamb"},searchQuery:{zh:"孜然羊肉",en:"cumin lamb stir fry"}}]}
+];
+
+// ── v3 临期食材点餐：逻辑 + 卡片 + 做好了闭环 ──
+var currentSuggestionIdx = 0;
+var suggestionInitDone = false;
+function countPresetInPantry(pid) {
+  var c = 0;
+  items.forEach(function(it){ if (it.presetId === pid) c++; });
+  return c;
+}
+// 生成候选：临期食材 × 其可用模式，按 wasteRank 再 priority 排序
+function getSuggestionCandidates() {
+  var cands = [], seen = {};
+  items.forEach(function(it){
+    var s = getStatus(it);
+    if (s !== 'soon' && s !== 'urg' && s !== 'exp') return;
+    if (!it.presetId) return;
+    var plan = INGREDIENT_PLANS.find(function(p){ return p.ingredientId === it.presetId; });
+    if (!plan) return;
+    plan.patterns.forEach(function(pe){
+      var key = it.presetId + '|' + pe.patternId;
+      if (seen[key]) return;  // 同食材类型+同模式去重（多个同名临期项只出一条）
+      var pattern = COOKING_PATTERNS.find(function(cp){ return cp.patternId === pe.patternId; });
+      if (!pattern) return;
+      var tq = pe.triggerQty || pattern.triggerQty;
+      if (tq && countPresetInPantry(it.presetId) < tq) return;
+      seen[key] = true;
+      cands.push({ item: it, plan: plan, patternEntry: pe, pattern: pattern });
+    });
+  });
+  cands.sort(function(a,b){
+    if (a.plan.wasteRank !== b.plan.wasteRank) return a.plan.wasteRank - b.plan.wasteRank;
+    return a.patternEntry.priority - b.patternEntry.priority;
+  });
+  return cands;
+}
+function hasSeasoning(pid) {
+  var p = PRESET_PANTRY.find(function(x){ return x.id === pid; });
+  var names = p ? [p.name.zh, p.name.en] : [pid];
+  return items.some(function(it){
+    if (it.presetId === pid) return true;
+    var n = (it.name || '').toLowerCase();
+    return names.some(function(nm){ return nm && n === nm.toLowerCase(); });
+  });
+}
+function suggestionSearchUrl(c) {
+  var sq = c.patternEntry.searchQuery || c.pattern.searchQuery;
+  if (lang === 'en') return 'https://www.google.com/search?q=' + encodeURIComponent(sq.en + ' recipe');
+  return 'https://www.xiachufang.com/search/?keyword=' + encodeURIComponent(sq.zh);
+}
+function buildSuggestionHtml(c, total) {
+  var it = c.item;
+  var iname = itemDisplayName(it);
+  var emoji = it.presetId ? ((PRESET_PANTRY.find(function(x){return x.id===it.presetId;})||{}).emoji || '🍽️') : '🍽️';
+  var pname = c.patternEntry.specificName ? (lang==='en'?c.patternEntry.specificName.en:c.patternEntry.specificName.zh)
+                                          : (lang==='en'?c.pattern.name.en:c.pattern.name.zh);
+  var note = lang==='en'?c.patternEntry.note.en:c.patternEntry.note.zh;
+  var method = lang==='en'?c.pattern.method.en:c.pattern.method.zh;
+  var seasHtml = c.pattern.baseSeasonings.map(function(sid){
+    var p = PRESET_PANTRY.find(function(x){ return x.id === sid; });
+    var nm = p ? (lang==='en'?p.name.en:p.name.zh) : sid;
+    var have = hasSeasoning(sid);
+    return '<span class="sc-seas ' + (have?'have':'need') + '">' + (have?'✓':'✗') + ' ' + nm + '</span>';
+  }).join('');
+  var html = '<div class="sc-top"><span class="sc-emoji">' + emoji + '</span>'
+    + '<span class="sc-title">' + txf('recipe_expiring', iname) + '</span></div>'
+    + '<div class="sc-pattern">' + pname + ' · <span class="sc-note">' + note + '</span></div>'
+    + '<div class="sc-method">' + method + '</div>';
+  if (seasHtml) html += '<div class="sc-seas-label">' + tx('recipe_seasonings') + '</div><div class="sc-seas-row">' + seasHtml + '</div>';
+  html += '<a class="sc-link" href="' + suggestionSearchUrl(c) + '" target="_blank" rel="noopener">' + tx('recipe_detail') + '</a>';
+  html += '<div class="sc-btns"><button class="sc-done" onclick="openCookConfirm()">' + tx('recipe_done') + '</button>';
+  if (total > 1) html += '<button class="sc-switch" onclick="switchSuggestion()">' + tx('recipe_switch') + '</button>';
+  html += '</div>';
+  return html;
+}
+function renderSuggestionCard() {
+  var el = document.getElementById('suggest-card');
+  if (!el) return;
+  var cands = getSuggestionCandidates();
+  if (!cands.length) {
+    el.classList.remove('has-sug');
+    var nAttn = items.filter(function(it){
+      var s = getStatus(it);
+      return s === 'soon' || s === 'urg' || s === 'exp';
+    }).length;
+    el.innerHTML = '<div class="sc-empty">' + (nAttn > 0 ? txf('recipe_no_match', nAttn) : tx('recipe_no_urgent')) + '</div>';
+    return;
+  }
+  el.classList.add('has-sug');
+  if (!suggestionInitDone) {
+    suggestionInitDone = true;
+    var last = null;
+    try { last = JSON.parse(localStorage.getItem('pantry_last_suggestion')); } catch(e) {}
+    if (last && last.date !== dateKey(today) && cands[0].pattern.patternId === last.patternId) {
+      var alt = -1;
+      for (var i = 0; i < cands.length; i++) { if (cands[i].pattern.patternId !== last.patternId) { alt = i; break; } }
+      if (alt > 0) currentSuggestionIdx = alt;
+    }
+  }
+  if (currentSuggestionIdx >= cands.length) currentSuggestionIdx = 0;
+  var c = cands[currentSuggestionIdx];
+  try { localStorage.setItem('pantry_last_suggestion', JSON.stringify({ date: dateKey(today), patternId: c.pattern.patternId })); } catch(e) {}
+  el.innerHTML = buildSuggestionHtml(c, cands.length);
+}
+function switchSuggestion() {
+  var cands = getSuggestionCandidates();
+  if (cands.length <= 1) return;
+  currentSuggestionIdx = (currentSuggestionIdx + 1) % cands.length;
+  renderSuggestionCard();
+}
+// 本模式能一起消耗的临期食材（建议项 + 其它临期且 plan 含此模式的）
+function getCookConsumables(c) {
+  var pid = c.pattern.patternId, res = [];
+  items.forEach(function(it){
+    var s = getStatus(it);
+    if (s !== 'soon' && s !== 'urg' && s !== 'exp') return;
+    if (!it.presetId) return;
+    var plan = INGREDIENT_PLANS.find(function(p){ return p.ingredientId === it.presetId; });
+    if (!plan || !plan.patterns.some(function(pe){ return pe.patternId === pid; })) return;
+    res.push(it);
+  });
+  if (res.indexOf(c.item) < 0) res.unshift(c.item);
+  return res;
+}
+var cookConsumables = [], cookChecked = {};
+function openCookConfirm() {
+  var cands = getSuggestionCandidates();
+  if (!cands.length) return;
+  if (currentSuggestionIdx >= cands.length) currentSuggestionIdx = 0;
+  cookConsumables = getCookConsumables(cands[currentSuggestionIdx]);
+  cookChecked = {};
+  cookConsumables.forEach(function(it){ cookChecked[it.id] = true; });
+  renderCookModal();
+  document.getElementById('cook-modal').classList.add('on');
+}
+function renderCookModal() {
+  document.getElementById('cook-modal-title').textContent = tx('recipe_confirm');
+  document.getElementById('cook-confirm-btn').textContent = tx('recipe_confirm');
+  document.getElementById('cook-cancel-btn').textContent = tx('con_cancel');
+  document.getElementById('cook-modal-sub').textContent = lang === 'en' ? 'Uncheck anything you did not use' : '没用到的可以取消勾选';
+  document.getElementById('cook-modal-list').innerHTML = cookConsumables.map(function(it){
+    var on = !!cookChecked[it.id];
+    return '<div class="cook-item' + (on?' on':'') + '" onclick="toggleCookItem(' + it.id + ')">'
+      + '<div class="rs-check">✓</div>'
+      + '<div class="cook-item-name">' + itemDisplayName(it) + (it.price>0?' <span class="cook-item-price">$'+it.price.toFixed(2)+'</span>':'') + '</div>'
+      + '</div>';
+  }).join('');
+}
+function toggleCookItem(id) { cookChecked[id] = !cookChecked[id]; renderCookModal(); }
+function closeCookConfirm() { document.getElementById('cook-modal').classList.remove('on'); }
+function confirmCook() {
+  var ids = Object.keys(cookChecked).filter(function(k){ return cookChecked[k]; }).map(Number);
+  if (!ids.length) { closeCookConfirm(); return; }
+  var saved = 0, cnt = 0;
+  ids.forEach(function(id){
+    var idx = items.findIndex(function(i){ return i.id === id; });
+    if (idx < 0) return;
+    var it = items[idx];
+    recordExit(it, 'use');
+    saved += (it.price || 0);
+    cnt++;
+    items.splice(idx, 1);
+  });
+  saveItems();
+  var streak = updateZeroWasteStreak();
+  closeCookConfirm();
+  renderPantry();
+  showCookSuccess(cnt, saved, streak);
+}
+function updateZeroWasteStreak() {
+  var todayK = dateKey(today), data = null;
+  try { data = JSON.parse(localStorage.getItem('pantry_zero_waste_streak')); } catch(e) {}
+  var streak = 1;
+  if (data && data.lastDate) {
+    if (data.lastDate === todayK) { streak = data.streak; }
+    else {
+      var y = new Date(today); y.setDate(y.getDate() - 1);
+      streak = (data.lastDate === dateKey(y)) ? (data.streak || 0) + 1 : 1;
+    }
+  }
+  localStorage.setItem('pantry_zero_waste_streak', JSON.stringify({ lastDate: todayK, streak: streak }));
+  return streak;
+}
+function showCookSuccess(cnt, saved, streak) {
+  var el = document.getElementById('cook-success');
+  var html = '<div class="cs-emoji">🎉</div>'
+    + '<div class="cs-line1">' + txf('recipe_great', cnt) + '</div>'
+    + '<div class="cs-line2">' + txf('recipe_saved', saved.toFixed(2)) + '</div>';
+  if (streak > 1) html += '<div class="cs-line3">' + txf('recipe_streak', streak) + '</div>';
+  el.innerHTML = html;
+  el.classList.add('on');
+  if (window._cookSuccessTimer) clearTimeout(window._cookSuccessTimer);
+  window._cookSuccessTimer = setTimeout(function(){ el.classList.remove('on'); }, 3000);
+  el.onclick = function(){ el.classList.remove('on'); };
+}
+
+// ── 🍳 做饭了：一次批量记录这顿饭用掉的所有食材 ──────────────
+// 解决"做一顿饭要跨分类逐个找食材点电池"的痛点：
+// 搜索 + 全库存列表（常用/临期靠前），点选即记；默认电池降一格，
+// 可切"用完了"整个移出，有数量的食材用 −/+ 调用量；确认后一次提交+可撤销
+var mealSel = {};
+function itemEmojiFor(it, CM) {
+  if (it.photo) return '<img src="' + it.photo + '" style="width:22px;height:22px;object-fit:cover;border-radius:6px"/>';
+  if (it.presetId) {
+    var p = PRESET_PANTRY.find(function(x){ return x.id === it.presetId; });
+    if (p && p.emoji) return p.emoji;
+  }
+  var cd = (CM || getCM())[it.cat];
+  return cd ? cd.e : '&#x1F4E6;';
+}
+function mealHasQty(it) {
+  return it.qty !== null && it.qty !== undefined && it.qty !== '' && extractQtyNumber(it.qty) > 0;
+}
+function openMealLog() {
+  mealSel = {};
+  var si = document.getElementById('ml-search');
+  si.value = '';
+  si.placeholder = tx('ml_search_ph');
+  document.getElementById('ml-title').textContent = tx('ml_title');
+  document.getElementById('ml-sub').textContent = tx('ml_sub');
+  document.getElementById('ml-cancel-btn').textContent = tx('con_cancel');
+  renderMealLogList();
+  document.getElementById('meal-log-modal').classList.add('on');
+}
+function closeMealLog() {
+  document.getElementById('meal-log-modal').classList.remove('on');
+}
+function renderMealLogList() {
+  var el = document.getElementById('ml-list');
+  var st = el.scrollTop;
+  var CM = getCM();
+  var q = (document.getElementById('ml-search').value || '').toLowerCase();
+  var ord = {exp:0,urg:1,soon:2,ok:3,nd:4};
+  var list = items.filter(function(i){
+    return i.name.toLowerCase().indexOf(q) >= 0 || (i.nameEn && i.nameEn.toLowerCase().indexOf(q) >= 0);
+  });
+  list.sort(function(a,b){
+    if (!!a.isFrequent !== !!b.isFrequent) return a.isFrequent ? -1 : 1;
+    var sa = ord[getStatus(a)], sb = ord[getStatus(b)];
+    if (sa !== sb) return sa - sb;
+    return itemDisplayName(a).localeCompare(itemDisplayName(b));
+  });
+  el.innerHTML = list.map(function(it){ return buildMealLogRow(it, CM); }).join('')
+    || '<div class="ml-empty">' + tx('ml_empty') + '</div>';
+  el.scrollTop = st;
+  updateMealLogConfirm();
+}
+function buildMealLogRow(it, CM) {
+  var sel = mealSel[it.id];
+  var lv = getStockLevel(it);
+  var stateStr = mealHasQty(it) ? (fmtQty(it) || '') : (lv === 1 ? tx('stock_lv1') : lv === 2 ? tx('stock_lv2') : '');
+  var ctrls = '';
+  if (sel) {
+    ctrls = '<div class="ml-ctrls" onclick="event.stopPropagation()">';
+    if (!sel.finished && mealHasQty(it)) {
+      var qStr = (sel.useQty % 1 === 0) ? String(sel.useQty) : sel.useQty.toFixed(1);
+      ctrls += '<button class="ml-step" onclick="mealStep(' + it.id + ',-1)">&minus;</button>'
+        + '<span class="ml-qty">' + qStr + (it.unit ? ' ' + it.unit : '') + '</span>'
+        + '<button class="ml-step" onclick="mealStep(' + it.id + ',1)">+</button>';
+    } else if (!sel.finished) {
+      var nl = Math.min(2, lv + 1);
+      ctrls += '<span class="ml-eff">' + txf('ml_next_lv', tx(nl===1?'stock_lv1':'stock_lv2')) + '</span>';
+    }
+    ctrls += '<button class="ml-fin' + (sel.finished ? ' on' : '') + '" onclick="toggleMealFinished(' + it.id + ')">' + tx('ml_fin') + '</button>';
+    ctrls += '</div>';
+  }
+  return '<div class="cook-item ml-item' + (sel ? ' on' : '') + '" onclick="toggleMealItem(' + it.id + ')">'
+    + '<div class="rs-check">✓</div>'
+    + '<span class="ml-emoji">' + itemEmojiFor(it, CM) + '</span>'
+    + '<div class="cook-item-name">' + itemDisplayName(it)
+    +   (stateStr ? '<span class="ml-state">' + stateStr + '</span>' : '')
+    + '</div>'
+    + ctrls
+    + '</div>';
+}
+function toggleMealItem(id) {
+  if (mealSel[id]) delete mealSel[id];
+  else {
+    var it = findItem(id);
+    if (!it) return;
+    mealSel[id] = { useQty: mealHasQty(it) ? Math.min(1, extractQtyNumber(it.qty)) : 1, finished: false };
+  }
+  renderMealLogList();
+}
+function toggleMealFinished(id) {
+  if (!mealSel[id]) return;
+  mealSel[id].finished = !mealSel[id].finished;
+  renderMealLogList();
+}
+function mealStep(id, d) {
+  var sel = mealSel[id], it = findItem(id);
+  if (!sel || !it) return;
+  var max = extractQtyNumber(it.qty);
+  var min = Math.min(1, max);
+  var v = sel.useQty + d;
+  if (v < min) v = min;
+  if (v > max) v = max;
+  sel.useQty = Math.round(v * 1000) / 1000;
+  renderMealLogList();
+}
+function updateMealLogConfirm() {
+  var n = Object.keys(mealSel).length;
+  var btn = document.getElementById('ml-confirm-btn');
+  btn.textContent = txf('ml_confirm', n);
+  btn.disabled = n === 0;
+}
+function confirmMealLog() {
+  var ids = Object.keys(mealSel).map(Number);
+  if (!ids.length) { closeMealLog(); return; }
+  var changed = [], removedSnaps = [], ledgerIds = [], finCnt = 0, n = 0;
+  ids.forEach(function(id){
+    var idx = items.findIndex(function(i){ return i.id === id; });
+    if (idx < 0) return;
+    var it = items[idx], sel = mealSel[id];
+    n++;
+    if (sel.finished) {
+      removedSnaps.push(JSON.parse(JSON.stringify(it)));
+      recordExit(it, 'use').forEach(function(x){ ledgerIds.push(x); });
+      items.splice(idx, 1);
+      finCnt++;
+    } else {
+      changed.push({ id: id, qty: it.qty, stockLevel: it.stockLevel, low: it.low });
+      if (mealHasQty(it)) {
+        it.qty = Math.max(0, Math.round((extractQtyNumber(it.qty) - sel.useQty) * 1000) / 1000);
+      } else {
+        it.stockLevel = Math.min(2, getStockLevel(it) + 1);
+        it.low = false;
+      }
+    }
+  });
+  mealSel = {};
+  saveItems();
+  closeMealLog();
+  renderPantry();
+  showUndoToast({ mode: 'meal', changed: changed, snapshots: removedSnaps, ledgerIds: ledgerIds, count: n, finCount: finCnt });
+}
 
 function getCats() {
   return CATS_DEF.map(function(c) {
@@ -1922,13 +2466,54 @@ function buildRowHtml(it, CM) {
     + '</div>';
 }
 
+// 点电池：先原地更新图标（行不跳走，连点也稳定），停手 0.9s 后再重排，
+// 归位的行闪烁高亮 + toast 说明新状态和去向，解决"点完不知道跳哪了"
+var stockCycleCtx = null;
 function cycleStockLevel(id) {
   var it = items.find(function(i){ return i.id === id; });
   if (!it) return;
-  it.stockLevel = (getStockLevel(it) + 1) % 3;
+  var prev = getStockLevel(it);
+  it.stockLevel = (prev + 1) % 3;
   it.low = false; // 清除旧字段避免干扰
   saveItems();
+  // 原地更新电池图标，不立刻重排
+  var wrap = document.querySelector('.row-wrap[data-id="' + id + '"]');
+  if (wrap) {
+    var btn = wrap.querySelector('.low-btn');
+    if (btn) {
+      var lv = it.stockLevel;
+      btn.className = 'low-btn' + (lv===1?' l1':lv===2?' l2':'');
+      btn.innerHTML = buildBatteryIcon(lv);
+    }
+  }
+  // 换了目标食材：先把上一个的归位结算掉
+  if (stockCycleCtx && stockCycleCtx.id !== id) {
+    clearTimeout(stockCycleCtx.timer);
+    finalizeStockCycle();
+  }
+  if (stockCycleCtx) clearTimeout(stockCycleCtx.timer);
+  else stockCycleCtx = { id: id, fromLevel: prev };
+  stockCycleCtx.timer = setTimeout(finalizeStockCycle, 900);
+}
+function finalizeStockCycle() {
+  if (!stockCycleCtx) return;
+  var ctx = stockCycleCtx; stockCycleCtx = null;
+  var it = items.find(function(i){ return i.id === ctx.id; });
   renderPantry();
+  if (!it) return;
+  var lv = getStockLevel(it);
+  var wrap = document.querySelector('.row-wrap[data-id="' + ctx.id + '"]');
+  if (wrap) {
+    wrap.classList.add('just-moved');
+    setTimeout(function(){ wrap.classList.remove('just-moved'); }, 1600);
+  }
+  var msg = txf('stock_toast', itemDisplayName(it), tx(lv===0?'stock_lv0':lv===1?'stock_lv1':'stock_lv2'));
+  var s = getStatus(it);
+  var urgent = s==='exp' || s==='urg' || s==='soon';
+  if (currentFilter === 'all' && !urgent && ((ctx.fromLevel>0) !== (lv>0))) {
+    msg += tx(lv>0 ? 'stock_moved_low' : 'stock_moved_back');
+  }
+  showUndoToast({ mode: 'info', msg: msg });
 }
 
 function renderPantry() {
@@ -2043,9 +2628,10 @@ function renderPantry() {
       editingItemId = null;
     }
   }
-  // 顶部横幅排他：按优先级一次只显示一条（到期 > 周六 > 备份 > Pro > 通知）
+  renderSuggestionCard();
+  // 顶部横幅排他：按优先级一次只显示一条（周六 > 备份 > Pro > 通知）
+  // 注：临期"到期警告"横幅已由上方"点餐建议卡"取代
   topBannerTaken = false;
-  checkExpiryAlert();
   checkDashNudge();
   checkBackupBar();
   checkProHooks();
@@ -3501,12 +4087,16 @@ function showUndoToast(ctx) {
   var undoBtn = document.getElementById('toast-undo-btn');
   if (ctx.mode === 'delete') {
     msg.textContent = ctx.count > 1 ? txf('done_toast_n', ctx.count) : txf('done_toast', ctx.name);
+  } else if (ctx.mode === 'meal') {
+    msg.textContent = txf('meal_toast', ctx.count, ctx.finCount);
+  } else if (ctx.mode === 'info') {
+    msg.textContent = ctx.msg;
   } else {
     var qStr = (ctx.delta % 1 === 0) ? String(ctx.delta) : ctx.delta.toFixed(1);
     msg.textContent = txf('quick_use_toast', ctx.name, qStr, ctx.unit);
   }
   undoBtn.textContent = tx('quick_use_undo');
-  undoBtn.style.display = '';
+  undoBtn.style.display = ctx.mode === 'info' ? 'none' : '';
 
   // 重置进度条
   if (undoToastBarTimer) clearTimeout(undoToastBarTimer);
@@ -3536,6 +4126,14 @@ function hideUndoToast() {
 function undoQuickConsume() {
   if (!undoToastCtx) return;
   if (undoToastCtx.mode === 'delete') {
+    undoToastCtx.snapshots.forEach(function(snap) { items.push(snap); });
+    removeLedger(undoToastCtx.ledgerIds);
+    saveItems(); renderPantry();
+  } else if (undoToastCtx.mode === 'meal') {
+    undoToastCtx.changed.forEach(function(c) {
+      var it = findItem(c.id);
+      if (it) { it.qty = c.qty; it.stockLevel = c.stockLevel; it.low = c.low; }
+    });
     undoToastCtx.snapshots.forEach(function(snap) { items.push(snap); });
     removeLedger(undoToastCtx.ledgerIds);
     saveItems(); renderPantry();
