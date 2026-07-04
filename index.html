@@ -3248,6 +3248,7 @@ function updateField(id, field, value) {
   } else if (field === 'price') {
     var pn = parseFloat(value);
     it.price = isNaN(pn) ? 0 : pn;
+    rememberPrice(it.presetId, [it.name, it.nameEn], pn);
   } else if (field === 'note') {
     it.note = value;
   }
@@ -3535,7 +3536,7 @@ function renderPresetPicker() {
     if (presetNeedsBB(p)) {
       html += '<div class="pchip-date"><input type="date" value="' + (bb || '') + '" onclick="event.stopPropagation()" onchange="setPresetBB(\'' + key.replace(/'/g, "\\'") + '\',this.value)"/></div>';
     }
-    var pPrice = (selected && selPresetItems[key].price !== undefined) ? selPresetItems[key].price : (p.defaultPrice || 0);
+    var pPrice = (selected && selPresetItems[key].price !== undefined) ? selPresetItems[key].price : presetUserPrice(p);
     html += '<div class="pchip-price">$<input type="number" min="0" step="0.01" inputmode="decimal" value="' + pPrice + '" onclick="event.stopPropagation()" onchange="setPresetPrice(\'' + key.replace(/'/g, "\\'") + '\',this.value)"/></div>';
     html += '</div>';
     return html;
@@ -3572,6 +3573,8 @@ function setPresetPrice(key, val) {
   if (selPresetItems[key]) {
     var pn = parseFloat(val);
     selPresetItems[key].price = isNaN(pn) ? 0 : pn;
+    var p = selPresetItems[key].preset;
+    if (p) rememberPrice(p.id, [p.name.zh, p.name.en], pn);
   }
 }
 
@@ -3600,12 +3603,12 @@ function addPresetItems() {
         unit: '',
         behaviorType: p.behaviorCat,
         presetId: p.id,
-        price: (ctx.price !== undefined ? ctx.price : (p.defaultPrice || 0)),
+        price: (ctx.price !== undefined ? ctx.price : presetUserPrice(p)),
         isFrequent: false,
         addedDate: dateKey(today),
         status: 'active',
       });
-      addLedger('buy', name, p.id, (ctx.price !== undefined ? ctx.price : (p.defaultPrice || 0)));
+      addLedger('buy', name, p.id, (ctx.price !== undefined ? ctx.price : presetUserPrice(p)));
     }
     freqMap[p.id] = (freqMap[p.id] || 0) + 1;
   });
@@ -5218,11 +5221,43 @@ function toggleBuyItem(i) {
   renderRestock();
 }
 // 直接修改某库存食材的单价（补货页常买项旁的价格框）
+// ── 用户价格记忆（pantry_price_map）──────────────────────────
+// 补货/添加各处用户改过的价格记下来，之后再入库同一食材优先用用户价，预设 defaultPrice 只做兜底
+var priceMemory = {};
+try { priceMemory = JSON.parse(localStorage.getItem('pantry_price_map')) || {}; } catch(e) { priceMemory = {}; }
+function savePriceMemory() { try { localStorage.setItem('pantry_price_map', JSON.stringify(priceMemory)); } catch(e) {} }
+function rememberPrice(presetId, names, price) {
+  var pn = parseFloat(price);
+  if (isNaN(pn) || pn <= 0) return; // 0/无效不覆盖记忆
+  pn = Math.round(pn * 100) / 100;
+  if (presetId) priceMemory['p:' + presetId] = pn;
+  (Array.isArray(names) ? names : [names]).forEach(function(n){
+    if (n) priceMemory['n:' + String(n).toLowerCase()] = pn;
+  });
+  savePriceMemory();
+}
+// 预设食材的取价：用户记忆（按 id，再按中/英文名）→ defaultPrice
+function presetUserPrice(p) {
+  if (!p) return 0;
+  var v = priceMemory['p:' + p.id];
+  if (v === undefined && p.name) {
+    v = priceMemory['n:' + (p.name.zh || '').toLowerCase()];
+    if (v === undefined) v = priceMemory['n:' + (p.name.en || '').toLowerCase()];
+  }
+  return (v !== undefined) ? v : (p.defaultPrice || 0);
+}
+// 非预设食材按名字取记忆价
+function namedUserPrice(name, fallback) {
+  var v = priceMemory['n:' + String(name || '').toLowerCase()];
+  return (v !== undefined) ? v : (fallback || 0);
+}
+
 function updateItemPrice(id, val) {
   var it = items.find(function(i){ return i.id === id; });
   if (!it) return;
   var pn = parseFloat(val);
   it.price = isNaN(pn) ? 0 : pn;
+  rememberPrice(it.presetId, [it.name, it.nameEn], pn);
   saveItems();
 }
 // 按名字匹配预设食材（用于待买项入库时带出分类/保质期/价格）
@@ -5728,7 +5763,7 @@ function renderBattle() {
       + (wasteCountFor(p.id, null) >= 2 ? '<div class="bm-waste-flag" title="' + tx('stats_repeat_warn') + '">⚠️</div>' : '')
       + '<div class="bm-card-ico">' + p.emoji + '</div>'
       + '<div class="bm-card-name">' + label + '</div>'
-      + '<div class="bm-card-price">$' + (p.defaultPrice || 0).toFixed(2) + '</div>'
+      + '<div class="bm-card-price">$' + presetUserPrice(p).toFixed(2) + '</div>'
       + '</div>';
   }).join('');
 
@@ -5757,7 +5792,7 @@ function renderBattle() {
   var cnt = Object.keys(battleCart).length + battleCustomItems.length;
   var total = Object.keys(battleCart).reduce(function(sum, id) {
     var p = PRESET_PANTRY.find(function(x) { return x.id === id; });
-    return sum + (p ? (p.defaultPrice || 0) : 0);
+    return sum + (p ? presetUserPrice(p) : 0);
   }, 0) + battleCustomItems.reduce(function(sum, c){ return sum + (c.price||0); }, 0);
 
   var hintEl = document.getElementById('bm-cart-hint');
@@ -5909,10 +5944,15 @@ function renderRestock() {
       var qtyNum = parseFloat(item.qty) || 0;
       var src = item.source === 'recipe' ? ' 📖' : '';
       var bought = !!restockBuyChecked[item.name];
+      // 价格：手动填过的 > 记忆价/预设价（预填显示，可直接改）
+      var pPreset = findPresetByName(item.name);
+      var pVal = (item.price !== undefined && item.price !== null && item.price !== '') ? parseFloat(item.price)
+               : (pPreset ? presetUserPrice(pPreset) : namedUserPrice(item.name, 0));
       return '<div style="margin-bottom:6px;">'
         + '<div class="rs-buy-item' + (bought ? ' on' : '') + '">'
         +   '<div class="rs-check" onclick="toggleBuyItem(' + i + ')">✓</div>'
         +   '<span style="font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + item.name + (item.unit ? ' <span style="color:var(--ink3);font-size:11px;">' + item.unit + '</span>' : '') + src + '</span>'
+        +   '<div class="rs-price-edit" onclick="event.stopPropagation()">$<input type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="' + (pVal > 0 ? pVal : '') + '" onchange="updateBuyItemPrice(' + i + ',this.value)"/></div>'
         +   '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">'
         +     '<button onclick="adjustManualQty(' + i + ',-1)" style="width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink2);font-size:14px;cursor:pointer;line-height:1;">-</button>'
         +     '<span style="min-width:28px;text-align:center;font-size:13px;font-weight:500;">' + (qtyNum > 0 ? qtyNum : '—') + '</span>'
@@ -5940,6 +5980,17 @@ function renderRestock() {
 function toggleRestockItem(id) {
   if (restockChecked[id]) { delete restockChecked[id]; } else { restockChecked[id] = true; }
   renderRestock();
+}
+
+// 待买区改价：存到待买项 + 写入价格记忆，入库和以后再买都按这个价
+function updateBuyItemPrice(i, val) {
+  var item = manualShoppingItems[i];
+  if (!item) return;
+  var pn = parseFloat(val);
+  item.price = isNaN(pn) ? undefined : pn;
+  saveManualShopping();
+  var p = findPresetByName(item.name);
+  rememberPrice(p ? p.id : null, p ? [item.name, p.name.zh, p.name.en] : [item.name], pn);
 }
 
 // Pro：把"建议加入常买"的食材标记为 ⭐ 常买
@@ -5986,6 +6037,7 @@ function confirmRestock() {
       addedDate: dateKey(today), status: 'active',
     });
     addLedger('buy', c.name, null, c.price || 0);
+    rememberPrice(null, c.name, c.price);
     anyChange = true;
   });
   // 待买区已勾选的（买到了）→ 加入库存并从待买清单移除
@@ -5996,7 +6048,10 @@ function confirmRestock() {
       var p = findPresetByName(item.name);
       var shelf = p ? (p.defaultShelfDays || 0) : 0;
       var bb = shelf > 0 ? (function(){ var dt = new Date(today); dt.setDate(dt.getDate() + shelf); return dateKey(dt); })() : '';
-      var price = p ? (p.defaultPrice || 0) : 0;
+      // 取价：用户在待买行填的 > 价格记忆 > 预设默认价
+      var price = (item.price !== undefined && item.price !== null && item.price !== '' && !isNaN(parseFloat(item.price)))
+        ? parseFloat(item.price)
+        : (p ? presetUserPrice(p) : namedUserPrice(item.name, 0));
       var qn = parseFloat(item.qty);
       items.push({
         id: nextItemId++, name: item.name, nameEn: p ? p.name.en : '', cat: p ? p.category : 'other', sub: '',
@@ -6096,7 +6151,7 @@ function goCheckout() {
   battleCheckoutData = {};
   Object.keys(battleCart).forEach(function(id) {
     var p = PRESET_PANTRY.find(function(x) { return x.id === id; });
-    if (p) battleCheckoutData[id] = { price: p.defaultPrice || 0, shelfDays: p.defaultShelfDays || 0 };
+    if (p) battleCheckoutData[id] = { price: presetUserPrice(p), shelfDays: p.defaultShelfDays || 0 };
   });
   // Expand all groups
   checkoutExpandedGroups = {};
@@ -6211,7 +6266,15 @@ function toggleCheckoutGroup(cat) {
 }
 
 function updateCheckoutPrice(id, val) {
-  if (battleCheckoutData[id]) battleCheckoutData[id].price = parseFloat(val) || 0;
+  if (!battleCheckoutData[id]) return;
+  var pn = parseFloat(val) || 0;
+  battleCheckoutData[id].price = pn;
+  var d = battleCheckoutData[id];
+  if (d.isCustom && d.item) rememberPrice(null, d.item.name, pn);
+  else {
+    var p = PRESET_PANTRY.find(function(x){ return x.id === id; });
+    if (p) rememberPrice(p.id, [p.name.zh, p.name.en], pn);
+  }
 }
 
 function updateCheckoutShelf(id, val) {
@@ -6265,6 +6328,7 @@ function confirmBattle() {
         addedDate: dateKey(today), status: 'active',
       });
       addLedger('buy', c.name, null, d.price || 0);
+      rememberPrice(null, c.name, d.price);
     }
   });
   saveFreq(); saveItems(); renderPantry();
@@ -6348,12 +6412,12 @@ function finishOnboarding() {
         note: '', photo: '', qty: null, unit: '',
         behaviorType: p.behaviorCat, stockLevel: 0,
         presetId: p.id,
-        price: p.defaultPrice || 0,
+        price: presetUserPrice(p),
         isFrequent: false,
         addedDate: dateKey(today),
         status: 'active',
       });
-      addLedger('buy', name, p.id, p.defaultPrice || 0);
+      addLedger('buy', name, p.id, presetUserPrice(p));
     }
   });
   if (Object.keys(obSelItems).length) saveItems();

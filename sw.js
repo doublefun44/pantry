@@ -1,5 +1,5 @@
 // 每次发版把版本号 +1（或改成日期），老缓存会在 activate 时被清掉
-var CACHE = 'funtry-v11';
+var CACHE = 'funtry-v12';
 var ASSETS = [
   './',
   './index.html',
