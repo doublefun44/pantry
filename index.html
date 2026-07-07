@@ -5849,7 +5849,6 @@ function toggleBattleItem(id) {
 }
 
 // ── RESTOCK ───────────────────────────────────────────────────
-var restockChecked = {};     // key: item.id → true（常买区勾选）
 var restockBuyChecked = {};  // key: 待买项 name → true（待买区"已买到"勾选）
 
 function toggleFrequent(id) {
@@ -5861,7 +5860,6 @@ function toggleFrequent(id) {
 }
 
 function showRestock() {
-  restockChecked = {};
   restockBuyChecked = {};
   // 迁移旧版饮食计划自动购物项到统一"待买"列表
   if (autoShoppingItems && autoShoppingItems.length) {
@@ -5893,8 +5891,7 @@ function renderRestock() {
   var addBtn = document.getElementById('rs-add-btn');
   if (addBtn) addBtn.textContent = tx('rs_add');
 
-  var buyCheckedCnt = manualShoppingItems.filter(function(it){ return restockBuyChecked[it.name]; }).length;
-  var checkedCnt = Object.keys(restockChecked).length + buyCheckedCnt;
+  var checkedCnt = manualShoppingItems.filter(function(it){ return restockBuyChecked[it.name]; }).length;
 
   if (cntEl) cntEl.textContent = checkedCnt > 0 ? txf('rs_count', checkedCnt) : tx('rs_count_zero');
   if (btn) {
@@ -5952,9 +5949,7 @@ function renderRestock() {
     html += '<div class="rs-mini-empty">' + tx('rs_empty').replace('\n','<br/>') + '</div>';
   } else {
     html += frequentItems.map(function(it) {
-      var on = !!restockChecked[it.id];
-      return '<div class="rs-item' + (on ? ' on' : '') + '" onclick="toggleRestockItem(' + it.id + ')">'
-        + '<div class="rs-check">✓</div>'
+      return '<div class="rs-item">'
         + '<div class="rs-item-ico">' + (function(cat){ var cm = getCM(); return (cm[cat]||{e:'📦'}).e; }(it.cat)) + '</div>'
         + '<div class="rs-item-body">'
         +   '<div class="rs-item-name">' + itemDisplayName(it) + '</div>'
@@ -5991,11 +5986,6 @@ function renderRestock() {
   listEl.innerHTML = html;
 }
 
-function toggleRestockItem(id) {
-  if (restockChecked[id]) { delete restockChecked[id]; } else { restockChecked[id] = true; }
-  renderRestock();
-}
-
 // 待买区改价：存到待买项 + 写入价格记忆，入库和以后再买都按这个价
 function updateBuyItemPrice(i, val) {
   var item = manualShoppingItems[i];
@@ -6027,20 +6017,6 @@ function showCustomSheetForRestock() {
 
 function confirmRestock() {
   var anyChange = false;
-  // Update frequent items
-  Object.keys(restockChecked).forEach(function(id) {
-    var it = items.find(function(i){ return i.id === parseInt(id); });
-    if (!it) return;
-    it.addedDate = dateKey(today);
-    it.stockLevel = 0;  // 补货 = 补满，电池恢复满格
-    it.low = false;     // 清除旧的低库存标记
-    if (it.shelf > 0) {
-      var dt = new Date(today); dt.setDate(dt.getDate() + it.shelf);
-      it.bb = dateKey(dt);
-    }
-    if (it.price > 0) addLedger('buy', it.name, it.presetId || null, it.price);
-    anyChange = true;
-  });
   // 待买区已勾选的（买到了）→ 加入库存并从待买清单移除
   if (Object.keys(restockBuyChecked).length) {
     var remaining = [];
@@ -6055,14 +6031,25 @@ function confirmRestock() {
         ? parseFloat(item.price)
         : (p ? presetUserPrice(p) : namedUserPrice(item.name, 0));
       var qn = parseFloat(item.qty);
-      items.push({
-        id: nextItemId++, name: item.name, nameEn: p ? p.name.en : '', cat: p ? p.category : (item.cat || 'other'), sub: '',
-        bb: bb, mfg: '', shelf: shelf, note: '', photo: '',
-        qty: (item.qty !== '' && item.qty != null && !isNaN(qn)) ? qn : null, unit: item.unit || '',
-        behaviorType: p ? p.behaviorCat : (catDef ? catDef.behaviorCat : 'fresh'), stockLevel: 0,
-        presetId: p ? p.id : null, price: price, isFrequent: false,
-        addedDate: dateKey(today), status: 'active',
-      });
+      // 在库已有同名条目（常买 🛒 来的）→ 刷新原条目：电池回满、日期重置，不建重复记录
+      var existing = items.find(function(x){ return x.name === item.name && x.status === 'active'; });
+      if (existing) {
+        existing.addedDate = dateKey(today);
+        existing.stockLevel = 0;  // 补货 = 补满，电池恢复满格
+        existing.low = false;
+        var exShelf = existing.shelf > 0 ? existing.shelf : shelf;
+        if (exShelf > 0) { var dt2 = new Date(today); dt2.setDate(dt2.getDate() + exShelf); existing.bb = dateKey(dt2); }
+        if (price > 0) existing.price = price;
+      } else {
+        items.push({
+          id: nextItemId++, name: item.name, nameEn: p ? p.name.en : '', cat: p ? p.category : (item.cat || 'other'), sub: '',
+          bb: bb, mfg: '', shelf: shelf, note: '', photo: '',
+          qty: (item.qty !== '' && item.qty != null && !isNaN(qn)) ? qn : null, unit: item.unit || '',
+          behaviorType: p ? p.behaviorCat : (catDef ? catDef.behaviorCat : 'fresh'), stockLevel: 0,
+          presetId: p ? p.id : null, price: price, isFrequent: false,
+          addedDate: dateKey(today), status: 'active',
+        });
+      }
       // 买入记账 = 单价 × 数量（未填数量按 1 件）
       var buyAmt = price * (qn > 0 ? qn : 1);
       if (buyAmt > 0) addLedger('buy', item.name, p ? p.id : null, buyAmt);
