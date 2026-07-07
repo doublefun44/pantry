@@ -1287,7 +1287,9 @@ var DICT = {
     rs_confirm:function(n){return '✅ 确认补货（'+n+' 件）';},
     rs_confirm_empty:'✅ 确认补货',
     rs_freq_mark:'标记常买',
-    rs_add:'＋ 添加其他食材',
+    rs_add:'＋ 增添常买食材',
+    rs_cs_title:'增添常买食材',rs_cs_add:'＋ 加入常买',
+    rs_cart_tip:'加入待买清单',
     rs_count:function(n){return '已勾选 '+n+' 件';},
     rs_count_zero:'勾选你今天买了的食材',
     rs_sec_frequent:'常买',
@@ -1297,7 +1299,7 @@ var DICT = {
     rs_share:'↑ 分享',
     rs_buy_ph_name:'商品名称',
     rs_buy_ph_qty:'数量',
-    rs_buy_ph_unit:'单位',
+    rs_buy_ph_price:'价格',
     rs_suggest_title:'建议加入常买',
     rs_suggest_add:'+ 加入常买',
     battle_cs_title:'添加自定义食材',battle_cs_lbl_name:'食材名称',
@@ -1528,7 +1530,9 @@ var DICT = {
     rs_confirm:function(n){return '✅ Restock ('+n+(n===1?' item':' items')+')';},
     rs_confirm_empty:'✅ Restock',
     rs_freq_mark:'Mark as frequent',
-    rs_add:'+ Add other items',
+    rs_add:'+ Add frequent item',
+    rs_cs_title:'Add frequent item',rs_cs_add:'+ Add to frequents',
+    rs_cart_tip:'Add to shopping list',
     rs_count:function(n){return n+(n===1?' item':' items')+' selected';},
     rs_count_zero:'Tap items you bought today',
     rs_sec_frequent:'Regulars',
@@ -1538,7 +1542,7 @@ var DICT = {
     rs_share:'↑ Share',
     rs_buy_ph_name:'Item name',
     rs_buy_ph_qty:'Qty',
-    rs_buy_ph_unit:'Unit',
+    rs_buy_ph_price:'Price',
     rs_suggest_title:'Suggested regulars',
     rs_suggest_add:'+ Add',
     battle_cs_title:'Add Custom Item',battle_cs_lbl_name:'Item name',
@@ -2771,7 +2775,7 @@ function addToCart(id) {
   if (!it) return;
   var exists = manualShoppingItems.some(function(m) { return m.name === it.name; });
   if (!exists) {
-    manualShoppingItems.push({ name: it.name, qty: '', unit: it.unit || '' });
+    manualShoppingItems.push({ name: it.name, qty: '', unit: it.unit || '', cat: it.cat, price: it.price > 0 ? it.price : undefined });
     saveManualShopping();
     renderManualItems();
   }
@@ -2783,7 +2787,7 @@ function addAllLowToCart() {
   var added = 0;
   low.forEach(function(it) {
     var exists = manualShoppingItems.some(function(m) { return m.name === it.name; });
-    if (!exists) { manualShoppingItems.push({ name: it.name, qty: '', unit: it.unit || '' }); added++; }
+    if (!exists) { manualShoppingItems.push({ name: it.name, qty: '', unit: it.unit || '', cat: it.cat, price: it.price > 0 ? it.price : undefined }); added++; }
   });
   if (added > 0) { saveManualShopping(); renderManualItems(); }
   showRestockToast(added, added === 0);
@@ -2793,7 +2797,7 @@ function addAllUrgentToCart() {
   var added = 0;
   urgentList.forEach(function(it) {
     var exists = manualShoppingItems.some(function(m) { return m.name === it.name; });
-    if (!exists) { manualShoppingItems.push({ name: it.name, qty: '', unit: it.unit || '' }); added++; }
+    if (!exists) { manualShoppingItems.push({ name: it.name, qty: '', unit: it.unit || '', cat: it.cat, price: it.price > 0 ? it.price : undefined }); added++; }
   });
   if (added > 0) { saveManualShopping(); renderManualItems(); }
   showRestockToast(added, added === 0);
@@ -5275,11 +5279,29 @@ function addToBuyItem() {
   var name = (nameEl.value || '').trim();
   if (!name) { nameEl.focus(); return; }
   var qty = (document.getElementById('rs-buy-qty').value || '').trim();
-  var unit = (document.getElementById('rs-buy-unit').value || '').trim();
-  manualShoppingItems.push({ name: name, qty: qty, unit: unit });
+  var catEl = document.getElementById('rs-buy-cat');
+  var cat = (catEl && catEl.value) || 'other';
+  var price = parseFloat((document.getElementById('rs-buy-price') || {}).value);
+  var hasPrice = !isNaN(price) && price > 0;
+  manualShoppingItems.push({ name: name, qty: qty, unit: '', cat: cat, price: hasPrice ? price : undefined });
+  if (hasPrice) rememberPrice(null, name, price);
   saveManualShopping();
   renderRestock();
   var nn = document.getElementById('rs-buy-name'); if (nn) nn.focus();
+}
+
+// 常买行 🛒：把该食材加入待买清单（价格沿用常买单价，数量默认 1，去待买区改），不代表已买
+function addFrequentToBuy(id) {
+  var it = items.find(function(i){ return i.id === id; });
+  if (!it) return;
+  var exists = manualShoppingItems.some(function(m){ return m.name === it.name; });
+  if (!exists) {
+    manualShoppingItems.push({ name: it.name, qty: '1', unit: it.unit || '', cat: it.cat, price: it.price > 0 ? it.price : undefined });
+    saveManualShopping();
+    renderManualItems();
+  }
+  renderRestock();
+  showRestockToast(exists ? 0 : 1, exists);
 }
 
 // ── 本月统计仪表盘 ───────────────────────────────────────────
@@ -5829,7 +5851,6 @@ function toggleBattleItem(id) {
 // ── RESTOCK ───────────────────────────────────────────────────
 var restockChecked = {};     // key: item.id → true（常买区勾选）
 var restockBuyChecked = {};  // key: 待买项 name → true（待买区"已买到"勾选）
-var restockCustomItems = []; // custom items added in restock context
 
 function toggleFrequent(id) {
   var it = items.find(function(i){ return i.id === id; });
@@ -5842,7 +5863,6 @@ function toggleFrequent(id) {
 function showRestock() {
   restockChecked = {};
   restockBuyChecked = {};
-  restockCustomItems = [];
   // 迁移旧版饮食计划自动购物项到统一"待买"列表
   if (autoShoppingItems && autoShoppingItems.length) {
     autoShoppingItems.forEach(function(ai) {
@@ -5874,7 +5894,7 @@ function renderRestock() {
   if (addBtn) addBtn.textContent = tx('rs_add');
 
   var buyCheckedCnt = manualShoppingItems.filter(function(it){ return restockBuyChecked[it.name]; }).length;
-  var checkedCnt = Object.keys(restockChecked).length + restockCustomItems.length + buyCheckedCnt;
+  var checkedCnt = Object.keys(restockChecked).length + buyCheckedCnt;
 
   if (cntEl) cntEl.textContent = checkedCnt > 0 ? txf('rs_count', checkedCnt) : tx('rs_count_zero');
   if (btn) {
@@ -5884,58 +5904,7 @@ function renderRestock() {
 
   var html = '';
 
-  // ── 常买区（⭐ 收藏的常备品，勾选确认补货） ──
-  html += '<div class="rs-sec-title">' + tx('rs_sec_frequent') + '</div>';
-  if (!frequentItems.length && !restockCustomItems.length) {
-    html += '<div class="rs-mini-empty">' + tx('rs_empty').replace('\n','<br/>') + '</div>';
-  } else {
-    html += frequentItems.map(function(it) {
-      var on = !!restockChecked[it.id];
-      return '<div class="rs-item' + (on ? ' on' : '') + '" onclick="toggleRestockItem(' + it.id + ')">'
-        + '<div class="rs-check">✓</div>'
-        + '<div class="rs-item-ico">' + (function(cat){ var cm = getCM(); return (cm[cat]||{e:'📦'}).e; }(it.cat)) + '</div>'
-        + '<div class="rs-item-body">'
-        +   '<div class="rs-item-name">' + itemDisplayName(it) + '</div>'
-        +   (it.bb ? '<div class="rs-item-meta">BB ' + it.bb + '</div>' : '')
-        + '</div>'
-        + '<div class="rs-price-edit" onclick="event.stopPropagation()">$<input type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="' + ((it.price && it.price > 0) ? it.price : '') + '" onchange="updateItemPrice(' + it.id + ',this.value)"/></div>'
-        + '</div>'
-        + proWasteReminderHtml(it.name);
-    }).join('');
-    html += restockCustomItems.map(function(c) {
-      return '<div class="rs-item on">'
-        + '<div class="rs-check">✓</div>'
-        + '<div class="rs-item-ico">📦</div>'
-        + '<div class="rs-item-body">'
-        +   '<div class="rs-item-name">' + c.name + '</div>'
-        +   (c.price ? '<div class="rs-item-meta">$' + c.price.toFixed(2) + '</div>' : '')
-        + '</div>'
-        + '</div>';
-    }).join('');
-  }
-
-  // ── 建议加入常买（Pro：isRegular 但未标 ⭐，确认才写入） ──
-  if (isProUnlocked()) {
-    var seenSug = {}, suggestions = [];
-    items.forEach(function(it){
-      if (it.isFrequent) return;
-      var key = it.presetId || ('name:' + (it.name || '').toLowerCase());
-      if (seenSug[key]) return;
-      if (isRegular(it)) { seenSug[key] = true; suggestions.push(it); }
-    });
-    if (suggestions.length) {
-      html += '<div class="rs-sec-title">' + tx('rs_suggest_title') + '</div>';
-      html += suggestions.map(function(it){
-        return '<div class="rs-suggest-item">'
-          + '<div class="rs-item-ico">' + (function(cat){ var cm = getCM(); return (cm[cat]||{e:'📦'}).e; }(it.cat)) + '</div>'
-          + '<div class="rs-item-body"><div class="rs-item-name">' + itemDisplayName(it) + '</div></div>'
-          + '<button class="rs-suggest-btn" onclick="markFrequentFromSuggestion(' + it.id + ')">' + tx('rs_suggest_add') + '</button>'
-          + '</div>';
-      }).join('');
-    }
-  }
-
-  // ── 待买区（食谱缺料 / 手动加 / 食材行🛒，可导出带去超市） ──
+  // ── 待买区（食谱缺料 / 手动加 / 食材行🛒，可导出带去超市）— 放最上方避免被淹没 ──
   html += '<div class="rs-sec-title">' + tx('rs_sec_tobuy') + '</div>';
   if (!manualShoppingItems.length) {
     html += '<div class="rs-mini-empty">' + tx('rs_tobuy_empty') + '</div>';
@@ -5964,14 +5933,59 @@ function renderRestock() {
         + '</div>';
     }).join('');
   }
-  html += '<div class="rs-buy-add">'
-    + '<input id="rs-buy-name" class="fi" placeholder="' + tx('rs_buy_ph_name') + '" style="flex:2;"/>'
-    + '<input id="rs-buy-qty" class="fi" type="number" min="0" step="any" placeholder="' + tx('rs_buy_ph_qty') + '" style="flex:1;"/>'
-    + '<input id="rs-buy-unit" class="fi" placeholder="' + tx('rs_buy_ph_unit') + '" style="flex:1;" onkeypress="if(event.key===&#39;Enter&#39;)addToBuyItem()"/>'
+  html += '<div class="rs-buy-add" style="flex-wrap:wrap;">'
+    + '<input id="rs-buy-name" class="fi" placeholder="' + tx('rs_buy_ph_name') + '" style="flex:2 1 52%;min-width:0;"/>'
+    + '<input id="rs-buy-qty" class="fi" type="number" min="0" step="any" placeholder="' + tx('rs_buy_ph_qty') + '" style="flex:1 1 26%;min-width:0;"/>'
+    + '<select id="rs-buy-cat" class="fi" style="flex:1.5 1 36%;min-width:0;">'
+    +   CATS_DEF.map(function(c){ return '<option value="' + c.id + '"' + (c.id === 'other' ? ' selected' : '') + '>' + c.e + ' ' + tx(c.lk) + '</option>'; }).join('')
+    + '</select>'
+    + '<input id="rs-buy-price" class="fi" type="number" min="0" step="0.01" inputmode="decimal" placeholder="$ ' + tx('rs_buy_ph_price') + '" style="flex:1 1 26%;min-width:0;" onkeypress="if(event.key===&#39;Enter&#39;)addToBuyItem()"/>'
     + '<button onclick="addToBuyItem()" style="width:36px;height:34px;border-radius:8px;background:var(--coral);color:#fff;border:none;font-size:18px;font-weight:300;cursor:pointer;flex-shrink:0;">+</button>'
     + '</div>';
   if (manualShoppingItems.length) {
     html += '<button class="rs-export-btn" onclick="exportShoppingList()">' + (navigator.share ? tx('rs_share') : tx('rs_export')) + '</button>';
+  }
+
+  // ── 常买区（⭐ 收藏的常备品，勾选确认补货） ──
+  html += '<div class="rs-sec-title">' + tx('rs_sec_frequent') + '</div>';
+  if (!frequentItems.length) {
+    html += '<div class="rs-mini-empty">' + tx('rs_empty').replace('\n','<br/>') + '</div>';
+  } else {
+    html += frequentItems.map(function(it) {
+      var on = !!restockChecked[it.id];
+      return '<div class="rs-item' + (on ? ' on' : '') + '" onclick="toggleRestockItem(' + it.id + ')">'
+        + '<div class="rs-check">✓</div>'
+        + '<div class="rs-item-ico">' + (function(cat){ var cm = getCM(); return (cm[cat]||{e:'📦'}).e; }(it.cat)) + '</div>'
+        + '<div class="rs-item-body">'
+        +   '<div class="rs-item-name">' + itemDisplayName(it) + '</div>'
+        +   (it.bb ? '<div class="rs-item-meta">BB ' + it.bb + '</div>' : '')
+        + '</div>'
+        + '<div class="rs-price-edit" onclick="event.stopPropagation()">$<input type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" value="' + ((it.price && it.price > 0) ? it.price : '') + '" onchange="updateItemPrice(' + it.id + ',this.value)"/></div>'
+        + '<button class="restock-btn show" onclick="event.stopPropagation();addFrequentToBuy(' + it.id + ')" title="' + tx('rs_cart_tip') + '">🛒</button>'
+        + '</div>'
+        + proWasteReminderHtml(it.name);
+    }).join('');
+  }
+
+  // ── 建议加入常买（Pro：isRegular 但未标 ⭐，确认才写入） ──
+  if (isProUnlocked()) {
+    var seenSug = {}, suggestions = [];
+    items.forEach(function(it){
+      if (it.isFrequent) return;
+      var key = it.presetId || ('name:' + (it.name || '').toLowerCase());
+      if (seenSug[key]) return;
+      if (isRegular(it)) { seenSug[key] = true; suggestions.push(it); }
+    });
+    if (suggestions.length) {
+      html += '<div class="rs-sec-title">' + tx('rs_suggest_title') + '</div>';
+      html += suggestions.map(function(it){
+        return '<div class="rs-suggest-item">'
+          + '<div class="rs-item-ico">' + (function(cat){ var cm = getCM(); return (cm[cat]||{e:'📦'}).e; }(it.cat)) + '</div>'
+          + '<div class="rs-item-body"><div class="rs-item-name">' + itemDisplayName(it) + '</div></div>'
+          + '<button class="rs-suggest-btn" onclick="markFrequentFromSuggestion(' + it.id + ')">' + tx('rs_suggest_add') + '</button>'
+          + '</div>';
+      }).join('');
+    }
   }
 
   listEl.innerHTML = html;
@@ -6006,6 +6020,9 @@ function markFrequentFromSuggestion(id) {
 function showCustomSheetForRestock() {
   customSheetContext = 'restock';
   showCustomSheet('other');
+  // 补货场景：这个表单是"增添常买食材"，覆盖大作战的标题/按钮文案
+  document.getElementById('bm-cs-title-txt').textContent = tx('rs_cs_title');
+  document.getElementById('bm-cs-add-btn').textContent   = tx('rs_cs_add');
 }
 
 function confirmRestock() {
@@ -6024,29 +6041,14 @@ function confirmRestock() {
     if (it.price > 0) addLedger('buy', it.name, it.presetId || null, it.price);
     anyChange = true;
   });
-  // Add custom items
-  restockCustomItems.forEach(function(c) {
-    var shelfDays = c.shelfDays || (CAT_DEFAULTS[c.cat] || CAT_DEFAULTS.other).defaultShelf;
-    var needsBB = c.behaviorCat === 'fresh' || c.behaviorCat === 'longtail';
-    var bb = needsBB ? (function(){ var dt = new Date(today); dt.setDate(dt.getDate() + shelfDays); return dateKey(dt); })() : '';
-    items.push({
-      id: nextItemId++, name: c.name, nameEn: '', cat: c.cat, sub: '',
-      bb: bb, mfg: '', shelf: shelfDays, note: '', photo: '', qty: null, unit: '',
-      behaviorType: c.behaviorCat, stockLevel: 0,
-      presetId: null, price: c.price || 0, isFrequent: false,
-      addedDate: dateKey(today), status: 'active',
-    });
-    addLedger('buy', c.name, null, c.price || 0);
-    rememberPrice(null, c.name, c.price);
-    anyChange = true;
-  });
   // 待买区已勾选的（买到了）→ 加入库存并从待买清单移除
   if (Object.keys(restockBuyChecked).length) {
     var remaining = [];
     manualShoppingItems.forEach(function(item) {
       if (!restockBuyChecked[item.name]) { remaining.push(item); return; }
       var p = findPresetByName(item.name);
-      var shelf = p ? (p.defaultShelfDays || 0) : 0;
+      var catDef = item.cat ? (CAT_DEFAULTS[item.cat] || CAT_DEFAULTS.other) : null;
+      var shelf = p ? (p.defaultShelfDays || 0) : (catDef ? catDef.defaultShelf : 0);
       var bb = shelf > 0 ? (function(){ var dt = new Date(today); dt.setDate(dt.getDate() + shelf); return dateKey(dt); })() : '';
       // 取价：用户在待买行填的 > 价格记忆 > 预设默认价
       var price = (item.price !== undefined && item.price !== null && item.price !== '' && !isNaN(parseFloat(item.price)))
@@ -6054,14 +6056,16 @@ function confirmRestock() {
         : (p ? presetUserPrice(p) : namedUserPrice(item.name, 0));
       var qn = parseFloat(item.qty);
       items.push({
-        id: nextItemId++, name: item.name, nameEn: p ? p.name.en : '', cat: p ? p.category : 'other', sub: '',
+        id: nextItemId++, name: item.name, nameEn: p ? p.name.en : '', cat: p ? p.category : (item.cat || 'other'), sub: '',
         bb: bb, mfg: '', shelf: shelf, note: '', photo: '',
         qty: (item.qty !== '' && item.qty != null && !isNaN(qn)) ? qn : null, unit: item.unit || '',
-        behaviorType: p ? p.behaviorCat : 'fresh', stockLevel: 0,
+        behaviorType: p ? p.behaviorCat : (catDef ? catDef.behaviorCat : 'fresh'), stockLevel: 0,
         presetId: p ? p.id : null, price: price, isFrequent: false,
         addedDate: dateKey(today), status: 'active',
       });
-      if (price > 0) addLedger('buy', item.name, p ? p.id : null, price);
+      // 买入记账 = 单价 × 数量（未填数量按 1 件）
+      var buyAmt = price * (qn > 0 ? qn : 1);
+      if (buyAmt > 0) addLedger('buy', item.name, p ? p.id : null, buyAmt);
       anyChange = true;
     });
     manualShoppingItems = remaining;
@@ -6134,7 +6138,21 @@ function confirmCustomItem() {
   };
   hideCustomSheet();
   if (customSheetContext === 'restock') {
-    restockCustomItems.push(entry);
+    // 增添常买食材：建一条 ⭐ 常买记录（不记购买账），要买时点行内 🛒 进待买清单
+    var dupFreq = items.some(function(i){ return i.isFrequent && i.name === name; });
+    if (!dupFreq) {
+      var dt = new Date(today); dt.setDate(dt.getDate() + def.defaultShelf);
+      items.push({
+        id: nextItemId++, name: name, nameEn: '', cat: cat, sub: '',
+        bb: dateKey(dt), mfg: '', shelf: def.defaultShelf, note: '', photo: '', qty: null, unit: '',
+        behaviorType: def.behaviorCat, stockLevel: 0,
+        presetId: null, price: price || 0, isFrequent: true,
+        addedDate: dateKey(today), status: 'active',
+      });
+      if (price > 0) rememberPrice(null, name, price);
+      saveItems();
+      renderPantry();
+    }
     renderRestock();
   } else {
     battleCustomItems.push(entry);
