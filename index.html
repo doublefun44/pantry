@@ -908,6 +908,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   </div>
   <div class="a2hs-banner-steps" id="a2hs-banner-steps">
     <div id="a2hs-banner-ios"></div>
+    <div id="a2hs-banner-ios2" style="opacity:.85;font-size:11px;"></div>
     <div id="a2hs-banner-android"></div>
   </div>
 </div>
@@ -1404,9 +1405,9 @@ var DICT = {
     welcome_browse:'先随便看看',
     a2hs_banner_text:'📱 添加到主屏幕，和 App 一样使用',
     a2hs_banner_how:'查看方法',
-    a2hs_banner_ios:'iPhone/iPad Safari：点底部 分享按钮 ↑ →「添加到主屏幕」',
-    a2hs_banner_ios_top:'iPhone/iPad Chrome：点右下角 ⋯ →「共享」→「添加到主屏幕」',
-    a2hs_banner_android:'Android：点右上角 ⋮ 菜单 →「添加到主屏幕」',
+    a2hs_banner_ios:'iPhone/iPad：用 Safari 打开 → 点 分享按钮 ↑ →「添加到主屏幕」',
+    a2hs_banner_ios_chrome:'（在 Chrome 里？复制网址，粘贴到 Safari 再按上面操作）',
+    a2hs_banner_android:'Android：点 ⋮ 菜单 →「添加到主屏幕」',
     a2hs_title:'保护你的数据',
     a2hs_body:'安装到主屏幕后，数据永久保存在你的手机上，还能像普通 App 一样全屏使用',
     a2hs_step_pre:'点击 Safari 底部的',
@@ -1657,9 +1658,9 @@ var DICT = {
     welcome_browse:'Just browsing',
     a2hs_banner_text:'📱 Add to home screen for the full app experience',
     a2hs_banner_how:'Show me how',
-    a2hs_banner_ios:'iPhone/iPad Safari: Tap Share ↑ at bottom → Add to Home Screen',
-    a2hs_banner_ios_top:'iPhone/iPad Chrome: Tap ⋯ at bottom right → Share → Add to Home Screen',
-    a2hs_banner_android:'Android: Tap ⋮ menu at top → Add to Home Screen',
+    a2hs_banner_ios:'iPhone/iPad: Open in Safari → tap Share ↑ → Add to Home Screen',
+    a2hs_banner_ios_chrome:'(Using Chrome? Copy the URL into Safari, then follow the step above)',
+    a2hs_banner_android:'Android: Tap ⋮ menu → Add to Home Screen',
     a2hs_title:'Keep your data safe',
     a2hs_body:'Install Funtry to your home screen — your data stays on your phone for good, and it works full-screen like a regular app',
     a2hs_step_pre:'Tap the Share button',
@@ -3719,8 +3720,8 @@ function refreshA2hsBannerText() {
   if (!document.getElementById('a2hs-banner-text')) return;
   document.getElementById('a2hs-banner-text').textContent    = tx('a2hs_banner_text');
   document.getElementById('a2hs-banner-how').textContent     = tx('a2hs_banner_how');
-  // iOS Chrome (CriOS) 的分享按钮在顶部地址栏旁，Safari 在底部工具栏，按 UA 显示对应说明
-  document.getElementById('a2hs-banner-ios').textContent     = tx(/CriOS/.test(navigator.userAgent) ? 'a2hs_banner_ios_top' : 'a2hs_banner_ios');
+  document.getElementById('a2hs-banner-ios').textContent     = tx('a2hs_banner_ios');
+  document.getElementById('a2hs-banner-ios2').textContent    = tx('a2hs_banner_ios_chrome');
   document.getElementById('a2hs-banner-android').textContent = tx('a2hs_banner_android');
 }
 function maybeShowA2hsBanner() {
