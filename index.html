@@ -653,6 +653,31 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 </head>
 
 <div id="root">
+  <!-- ══ 迁移横幅（GitHub Pages → funtry.app）· 上线一个月后（约 2026-08-08）连同下方 script 整块删除 ══ -->
+  <div id="migrate-banner" style="display:none;position:relative;flex-shrink:0;z-index:600;background:#C2410C;color:#fff;padding:10px 40px 10px 14px;font-size:13px;line-height:1.5;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.18);">
+    <span id="migrate-banner-msg"></span><a id="migrate-banner-link" href="https://funtry.app" style="color:#FFE8D6;font-weight:700;text-decoration:underline;white-space:nowrap;"></a>
+    <button onclick="dismissMigrationBanner()" title="关闭" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:none;background:rgba(255,255,255,.22);color:#fff;font-size:15px;cursor:pointer;line-height:1;padding:0;">&#xD7;</button>
+  </div>
+  <script>
+  function renderMigrationBanner() {
+    var el = document.getElementById('migrate-banner');
+    if (!el) return;
+    var onPages = /\.github\.io$/i.test(location.hostname);
+    var dismissed = localStorage.getItem('migrate_banner_dismissed') === '1';
+    if (!onPages || dismissed) { el.style.display = 'none'; return; }
+    var l = localStorage.getItem('pantry_lang') || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en');
+    document.getElementById('migrate-banner-msg').textContent = l === 'en'
+      ? 'Funtry has moved! Export your data first, then import at funtry.app → '
+      : '食光仓搬家了！请先导出数据，再前往 funtry.app 导入 → ';
+    document.getElementById('migrate-banner-link').textContent = l === 'en' ? 'Go to new site' : '前往新地址';
+    el.style.display = 'block';
+  }
+  function dismissMigrationBanner() {
+    localStorage.setItem('migrate_banner_dismissed', '1');
+    document.getElementById('migrate-banner').style.display = 'none';
+  }
+  renderMigrationBanner();
+  </script>
   <nav>
     <div class="nt on" id="nav-p" onclick="goPage('p')"><span class="ni">&#x1F9FA;</span>趣囤</div>
     <div class="nt" id="nav-m" onclick="goPage('m')"><span class="ni">&#x1F37D;&#xFE0F;</span>饮食计划</div>
@@ -1625,6 +1650,7 @@ function setLang(l) {
 
 function applyLang() {
   document.documentElement.lang = lang === 'en' ? 'en' : 'zh';
+  if (window.renderMigrationBanner) renderMigrationBanner(); // 迁移横幅跟随语言，删横幅时同删此行
   // nav
   document.getElementById('nav-p').innerHTML = '<span class="ni">&#x1F9FA;</span>' + tx('nav_pantry');
   document.getElementById('nav-m').innerHTML = '<span class="ni">&#x1F4D6;</span>' + tx('nav_recipe');
