@@ -182,6 +182,14 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .dash-nudge.on{display:flex;}
 .dash-nudge-text{flex:1;font-size:12px;color:var(--ink2);line-height:1.4;cursor:pointer;}
 .dash-nudge-close{background:none;border:none;color:var(--ink3);font-size:16px;cursor:pointer;padding:0 2px;line-height:1;}
+#a2hs-banner{display:none;position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%);width:calc(100% - 24px);max-width:406px;background:var(--green);border:none;border-radius:var(--r);box-shadow:0 6px 24px rgba(0,0,0,.3);z-index:320;padding:11px 12px;}
+#a2hs-banner.on{display:block;}
+.a2hs-banner-row{display:flex;align-items:center;gap:8px;}
+.a2hs-banner-text{flex:1;font-size:13px;color:#fff;line-height:1.4;font-weight:500;}
+.a2hs-banner-how{background:#fff;color:var(--green);border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
+.a2hs-banner-x{background:none;border:none;color:rgba(255,255,255,.85);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;}
+.a2hs-banner-steps{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.35);font-size:12px;color:rgba(255,255,255,.95);line-height:1.75;}
+.a2hs-banner-steps.on{display:block;}
 .pro-hook{display:flex;margin:6px 12px 0;background:#F3F0FF;border:1.5px solid #C9BCF5;border-radius:var(--rsm);padding:9px 12px;align-items:center;gap:8px;}
 .pro-hook-text{flex:1;font-size:12px;color:var(--ink2);line-height:1.4;}
 .pro-hook-btn{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;background:#7C5CE0;color:#fff;}
@@ -669,7 +677,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     document.getElementById('migrate-banner-msg').textContent = l === 'en'
       ? 'Funtry has moved! Export your data first, then import at funtry.app → '
       : '食光仓搬家了！请先导出数据，再前往 funtry.app 导入 → ';
-    document.getElementById('migrate-banner-link').textContent = l === 'en' ? 'Go to new site' : '前往新地址';
+    document.getElementById('migrate-banner-link').textContent = l === 'en' ? 'Go to new site (add to home screen for best experience)' : '前往新地址（建议添加到桌面使用）';
     el.style.display = 'block';
   }
   function dismissMigrationBanner() {
@@ -678,6 +686,21 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   }
   renderMigrationBanner();
   </script>
+
+  <!-- 首屏欢迎遮罩（新用户，无食材数据时显示） -->
+  <div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:700;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 28px;max-width:430px;margin:0 auto;">
+    <div class="lang-toggle" style="position:absolute;top:20px;right:20px;">
+      <button class="lang-btn" id="wel-lb-zh" onclick="setLang('zh')">中文</button>
+      <button class="lang-btn" id="wel-lb-en" onclick="setLang('en')">EN</button>
+    </div>
+    <div style="font-size:54px;margin-bottom:22px;">🛒</div>
+    <h2 id="welcome-title" style="font-size:22px;font-weight:600;color:var(--ink);line-height:1.35;margin-bottom:18px;font-family:'DM Sans',sans-serif;"></h2>
+    <p id="welcome-line1" style="font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:4px;"></p>
+    <p id="welcome-line2" style="font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:36px;"></p>
+    <button id="welcome-go" onclick="welcomeGo()" style="width:100%;max-width:320px;padding:15px;border:none;border-radius:14px;background:var(--coral);color:#fff;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:12px;"></button>
+    <button id="welcome-browse" onclick="welcomeBrowse()" style="width:100%;max-width:320px;padding:13px;border:none;border-radius:14px;background:none;color:var(--ink3);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;"></button>
+  </div>
+
   <nav>
     <div class="nt on" id="nav-p" onclick="goPage('p')"><span class="ni">&#x1F9FA;</span>趣囤</div>
     <div class="nt" id="nav-m" onclick="goPage('m')"><span class="ni">&#x1F37D;&#xFE0F;</span>饮食计划</div>
@@ -876,6 +899,19 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 </div>
 
 <!-- ADD TO HOME SCREEN MODAL -->
+<!-- 底部「添加到桌面」提示条（非独立模式且未关闭时显示） -->
+<div id="a2hs-banner">
+  <div class="a2hs-banner-row">
+    <span class="a2hs-banner-text" id="a2hs-banner-text"></span>
+    <button class="a2hs-banner-how" id="a2hs-banner-how" onclick="toggleA2hsSteps()"></button>
+    <button class="a2hs-banner-x" onclick="dismissA2hsBanner()" title="关闭">&#xD7;</button>
+  </div>
+  <div class="a2hs-banner-steps" id="a2hs-banner-steps">
+    <div id="a2hs-banner-ios"></div>
+    <div id="a2hs-banner-android"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="a2hs-modal">
   <div class="modal-box">
     <div style="text-align:center;font-size:36px;margin-bottom:8px;">🛡️</div>
@@ -1361,6 +1397,15 @@ var DICT = {
     recipe_streak:function(n){return '连续 '+n+' 天零浪费 🎉';},
     recipe_great:function(n){return '做得好！消耗了 '+n+' 样临期食材';},
     recipe_seasonings:'调料',
+    welcome_title:'你家现在有哪些食材？',
+    welcome_line1:'像逛超市一样点一点，快速记下你已有的',
+    welcome_line2:'不用打字，3 分钟盘点冰箱橱柜',
+    welcome_go:'开始盘点',
+    welcome_browse:'先随便看看',
+    a2hs_banner_text:'📱 添加到主屏幕，和 App 一样使用',
+    a2hs_banner_how:'查看方法',
+    a2hs_banner_ios:'iPhone/iPad：点底部 分享按钮 ↑ →「添加到主屏幕」',
+    a2hs_banner_android:'Android：点右上角 ⋮ 菜单 →「添加到主屏幕」',
     a2hs_title:'保护你的数据',
     a2hs_body:'安装到主屏幕后，数据永久保存在你的手机上，还能像普通 App 一样全屏使用',
     a2hs_step_pre:'点击 Safari 底部的',
@@ -1604,6 +1649,15 @@ var DICT = {
     recipe_streak:function(n){return n+' day zero-waste streak 🎉';},
     recipe_great:function(n){return 'Nice! Used up '+n+' expiring items';},
     recipe_seasonings:'Seasonings',
+    welcome_title:"What's in your kitchen right now?",
+    welcome_line1:'Tap through a supermarket to log what you already have',
+    welcome_line2:'No typing — inventory your pantry in 3 minutes',
+    welcome_go:'Start stocking',
+    welcome_browse:'Just browsing',
+    a2hs_banner_text:'📱 Add to home screen for the full app experience',
+    a2hs_banner_how:'Show me how',
+    a2hs_banner_ios:'iPhone/iPad: Tap Share ↑ at bottom → Add to Home Screen',
+    a2hs_banner_android:'Android: Tap ⋮ menu at top → Add to Home Screen',
     a2hs_title:'Keep your data safe',
     a2hs_body:'Install Funtry to your home screen — your data stays on your phone for good, and it works full-screen like a regular app',
     a2hs_step_pre:'Tap the Share button',
@@ -1651,6 +1705,8 @@ function setLang(l) {
 function applyLang() {
   document.documentElement.lang = lang === 'en' ? 'en' : 'zh';
   if (window.renderMigrationBanner) renderMigrationBanner(); // 迁移横幅跟随语言，删横幅时同删此行
+  if (window.refreshWelcomeOverlay) refreshWelcomeOverlay();  // 首屏遮罩跟随语言切换
+  if (window.refreshA2hsBannerText) refreshA2hsBannerText();  // 底部「添加到桌面」条跟随语言切换
   // nav
   document.getElementById('nav-p').innerHTML = '<span class="ni">&#x1F9FA;</span>' + tx('nav_pantry');
   document.getElementById('nav-m').innerHTML = '<span class="ni">&#x1F4D6;</span>' + tx('nav_recipe');
@@ -3656,8 +3712,33 @@ function isStandalone() {
     || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
 }
 
+// 底部「添加到桌面」提示条（新版；与旧模态共享关闭状态，避免重复打扰）
+function refreshA2hsBannerText() {
+  if (!document.getElementById('a2hs-banner-text')) return;
+  document.getElementById('a2hs-banner-text').textContent    = tx('a2hs_banner_text');
+  document.getElementById('a2hs-banner-how').textContent     = tx('a2hs_banner_how');
+  document.getElementById('a2hs-banner-ios').textContent     = tx('a2hs_banner_ios');
+  document.getElementById('a2hs-banner-android').textContent = tx('a2hs_banner_android');
+}
+function maybeShowA2hsBanner() {
+  if (isStandalone()) return;
+  if (localStorage.getItem('funtry_a2hs_dismissed') === 'true') return; // 只认新横幅自己的 × 关闭标记
+  refreshA2hsBannerText();
+  document.getElementById('a2hs-banner').classList.add('on');
+}
+function toggleA2hsSteps() {
+  document.getElementById('a2hs-banner-steps').classList.toggle('on');
+}
+function dismissA2hsBanner() {
+  localStorage.setItem('funtry_a2hs_dismissed', 'true');
+  document.getElementById('a2hs-banner').classList.remove('on');
+}
+
 function maybeShowA2HS() {
   if (isStandalone()) return;
+  if (localStorage.getItem('funtry_a2hs_dismissed') === 'true') return;  // 底部提示条已处理
+  var _bn = document.getElementById('a2hs-banner');
+  if (_bn && _bn.classList.contains('on')) return;                       // 提示条正在显示，别再弹模态
   var s = localStorage.getItem('pantry_a2hs_shown');
   if (s === 'done' || (parseInt(s, 10) || 0) >= 2) return;
   setTimeout(function() {
@@ -6463,6 +6544,34 @@ function closeOnboarding() {
   renderPantry();
 }
 
+// ── 12c. WELCOME OVERLAY（首屏欢迎，新用户首开显示） ────────────
+function refreshWelcomeOverlay() {
+  var ov = document.getElementById('welcome-overlay');
+  if (!ov) return;
+  document.getElementById('welcome-title').textContent  = tx('welcome_title');
+  document.getElementById('welcome-line1').textContent  = tx('welcome_line1');
+  document.getElementById('welcome-line2').textContent  = tx('welcome_line2');
+  document.getElementById('welcome-go').textContent     = tx('welcome_go');
+  document.getElementById('welcome-browse').textContent = tx('welcome_browse');
+  var wz = document.getElementById('wel-lb-zh'); if (wz) wz.classList.toggle('on', lang === 'zh');
+  var we = document.getElementById('wel-lb-en'); if (we) we.classList.toggle('on', lang === 'en');
+}
+function showWelcomeOverlay() {
+  refreshWelcomeOverlay();
+  document.getElementById('welcome-overlay').style.display = 'flex';
+}
+function hideWelcomeOverlay() {
+  document.getElementById('welcome-overlay').style.display = 'none';
+  localStorage.setItem('pantry_v9_onboarded', '1');  // 记住已引导，之后不再弹
+}
+function welcomeGo() {      // [开始] → 直接启动超市大作战
+  hideWelcomeOverlay();
+  showBattle();
+}
+function welcomeBrowse() {  // [先随便看看] → 进入正常主界面
+  hideWelcomeOverlay();
+}
+
 // ── 13. INIT ──────────────────────────────────────────────────
 today.setHours(0,0,0,0);
 // 记录 App 打开次数（通知请求横幅从第 2 次打开起才显示）
@@ -6478,10 +6587,19 @@ applyLang();
 renderPantry();
 renderRecipes();
 
-if (localStorage.getItem('pantry_v9_i') === null && localStorage.getItem('pantry_v9_onboarded') !== '1') {
-  showOnboarding();
+// Deep link ?start=dash → 直接启动超市大作战，跳过首屏遮罩（landing/社媒 CTA 用）
+var _startParams = new URLSearchParams(location.search);
+if (_startParams.get('start') === 'dash') {
+  _startParams.delete('start');  // 清掉参数，避免刷新时重复触发；保留其他 query
+  var _qs = _startParams.toString();
+  history.replaceState(null, '', location.pathname + (_qs ? '?' + _qs : '') + location.hash);
+  localStorage.setItem('pantry_v9_onboarded', '1');
+  showBattle();
+} else if (localStorage.getItem('pantry_v9_i') === null && localStorage.getItem('pantry_v9_onboarded') !== '1') {
+  showWelcomeOverlay();
 }
 checkAndFireNotif();
+maybeShowA2hsBanner();  // 底部「添加到桌面」提示条（非独立模式、未关闭时）
 
 // ── 14. 输入框聚焦时滚动到视口上部,避免被 iOS QuickType 工具栏和键盘遮挡 ──
 // 同时全局兜底:禁止 iOS 的"自动填充联系人"提示(给所有输入框补齐 autocomplete=off 等属性)
