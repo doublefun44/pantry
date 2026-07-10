@@ -1892,9 +1892,9 @@ var PRESET_PANTRY = [
   {id:'cilantro',        name:{zh:'香菜',      en:'Cilantro'},        category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:5,   defaultPrice:1.00, emoji:'🌿'},
   {id:'ginger',          name:{zh:'生姜',      en:'Ginger'},          category:'veg',     displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:14,  defaultPrice:1.00, emoji:'🫚'},
   {id:'onion',           name:{zh:'洋葱',      en:'Onion'},           category:'veg',     displayCat:'fresh',     behaviorCat:'longtail', defaultShelfDays:30,  defaultPrice:0.80, emoji:'🧅'},
-  {id:'garlic',          name:{zh:'大蒜',      en:'Garlic'},          category:'veg',     displayCat:'fresh',     behaviorCat:'staple',                         defaultPrice:0.80, emoji:'🧄'},
+  {id:'garlic',          name:{zh:'大蒜',      en:'Garlic'},          category:'veg',     displayCat:'fresh',     behaviorCat:'staple',   defaultShelfDays:60,  defaultPrice:0.80, emoji:'🧄'},
   // ── 生鲜 · 蛋奶 ──────────────────────────────────────────────
-  {id:'egg',             name:{zh:'鸡蛋',      en:'Egg'},             category:'dairy',   displayCat:'fresh',     behaviorCat:'periodic',                       defaultPrice:4.50, emoji:'🥚'},
+  {id:'egg',             name:{zh:'鸡蛋',      en:'Egg'},             category:'dairy',   displayCat:'fresh',     behaviorCat:'periodic', defaultShelfDays:14,  defaultPrice:4.50, emoji:'🥚'},
   {id:'milk',            name:{zh:'牛奶',      en:'Milk'},            category:'dairy',   displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:7,   defaultPrice:4.00, emoji:'🥛'},
   {id:'greek-yogurt',    name:{zh:'希腊酸奶',  en:'Greek Yogurt'},    category:'dairy',   displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:14,  defaultPrice:4.00, emoji:'🫙'},
   {id:'feta-cheese',     name:{zh:'菲达奶酪',  en:'Feta Cheese'},     category:'dairy',   displayCat:'fresh',     behaviorCat:'fresh',    defaultShelfDays:14,  defaultPrice:4.50, emoji:'🧀'},
@@ -3562,7 +3562,8 @@ function switchAddTab(tab) {
 }
 
 function presetNeedsBB(p) {
-  return p.behaviorCat === 'fresh' || p.behaviorCat === 'longtail';
+  // fresh/longtail 之外，staple/periodic 里配了 defaultShelfDays 的（如鸡蛋、大蒜）也要 BB
+  return p.behaviorCat === 'fresh' || p.behaviorCat === 'longtail' || (p.defaultShelfDays > 0);
 }
 
 function presetDefaultBB(p, frozen) {
@@ -6329,12 +6330,12 @@ function renderCheckout() {
           + '<span class="bm-co-item-name">' + label + '</span>'
           + '<div class="bm-co-item-fields">'
           +   '<div class="bm-co-field">'
-          +     '<input class="bm-co-input" type="number" value="' + (d.price||0).toFixed(2) + '" min="0" step="0.5" inputmode="decimal" onclick="event.stopPropagation()" onchange="updateCheckoutPrice(\'' + id + '\',this.value)"/>'
+          +     '<input class="bm-co-input" type="number" value="' + (d.price||0).toFixed(2) + '" min="0" step="0.5" inputmode="decimal" onclick="event.stopPropagation()" onfocus="this.select()" onchange="updateCheckoutPrice(\'' + id + '\',this.value)"/>'
           +     '<span class="bm-co-label">$</span>'
           +   '</div>';
         if (needsShelf) {
           html += '<div class="bm-co-field">'
-            +   '<input class="bm-co-input" type="number" value="' + (d.shelfDays||0) + '" min="1" step="1" inputmode="numeric" onclick="event.stopPropagation()" onchange="updateCheckoutShelf(\'' + id + '\',this.value)"/>'
+            +   '<input class="bm-co-input" type="number" value="' + (d.shelfDays||0) + '" min="1" step="1" inputmode="numeric" onclick="event.stopPropagation()" onfocus="this.select()" onchange="updateCheckoutShelf(\'' + id + '\',this.value)"/>'
             +   '<span class="bm-co-label">' + tx('battle_co_days') + '</span>'
             + '</div>';
         }
@@ -6349,11 +6350,11 @@ function renderCheckout() {
           + '<span class="bm-co-item-name">' + c.name + '</span>'
           + '<div class="bm-co-item-fields">'
           +   '<div class="bm-co-field">'
-          +     '<input class="bm-co-input" type="number" value="' + (dc.price||0).toFixed(2) + '" min="0" step="0.5" inputmode="decimal" onclick="event.stopPropagation()" onchange="updateCheckoutPrice(\'' + c.cid + '\',this.value)"/>'
+          +     '<input class="bm-co-input" type="number" value="' + (dc.price||0).toFixed(2) + '" min="0" step="0.5" inputmode="decimal" onclick="event.stopPropagation()" onfocus="this.select()" onchange="updateCheckoutPrice(\'' + c.cid + '\',this.value)"/>'
           +     '<span class="bm-co-label">$</span>'
           +   '</div>'
           +   '<div class="bm-co-field">'
-          +     '<input class="bm-co-input" type="number" value="' + (dc.shelfDays||7) + '" min="1" step="1" inputmode="numeric" onclick="event.stopPropagation()" onchange="updateCheckoutShelf(\'' + c.cid + '\',this.value)"/>'
+          +     '<input class="bm-co-input" type="number" value="' + (dc.shelfDays||7) + '" min="1" step="1" inputmode="numeric" onclick="event.stopPropagation()" onfocus="this.select()" onchange="updateCheckoutShelf(\'' + c.cid + '\',this.value)"/>'
           +     '<span class="bm-co-label">' + tx('battle_co_days') + '</span>'
           +   '</div>'
           + '</div></div>';
