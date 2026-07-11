@@ -54,12 +54,11 @@ section{padding:56px 0;}
 
 /* media slots */
 .sec-title{font-family:'DM Serif Display',serif;font-size:26px;text-align:center;margin-bottom:28px;}
-.video-slot{background:var(--card);border:2px dashed var(--line);border-radius:var(--r);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:14px;text-align:center;padding:20px;}
+/* 竖屏录屏 720×1566；裁掉顶部 136px（状态栏+悬浮球，球底缘实测 134、内容顶缘 139）：容器高按剩余 1430，视频上移 136/720=18.89% 宽 */
+.video-slot{background:var(--card);border:1px solid var(--line);border-radius:var(--r);aspect-ratio:720/1430;max-width:340px;margin:0 auto;overflow:hidden;}
+.video-slot video{width:100%;height:auto;display:block;margin-top:-18.89%;}
 .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.shot{background:var(--card);border:2px dashed var(--line);border-radius:var(--r);aspect-ratio:9/19;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:13px;text-align:center;padding:10px;}
-/* TODO(上线后补素材): 录好演示视频 + 3 张真机截图后，删掉下面这条规则即可让两块重新显示，并替换 {{VIDEO_EMBED}} / {{SCREENSHOT_1..3}} */
-.pending-asset{display:none;}
-
+.shot{background:var(--card);border:1px solid var(--line);border-radius:var(--r);aspect-ratio:9/19;width:100%;object-fit:cover;display:block;}
 /* install */
 .install{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px 24px;}
 .install h2{font-family:'DM Serif Display',serif;font-size:24px;text-align:center;margin-bottom:22px;}
@@ -79,7 +78,6 @@ footer p{font-size:13px;color:var(--ink3);}
 @media (max-width:420px){
   .hero h1{font-size:32px;}
   .shots{gap:8px;}
-  .shot{font-size:11px;}
 }
 </style>
 </head>
@@ -102,7 +100,7 @@ footer p{font-size:13px;color:var(--ink3);}
     <img class="hero-logo" src="icon-512.png" alt="Funtry"/>
     <h1 data-t="hero_h1"></h1>
     <p data-t="hero_sub"></p>
-    <a class="cta" href="{{GUMROAD_URL}}" data-t="cta"></a>
+    <a class="cta" href="/?start=dash" data-t="cta"></a>
     <span class="cta-note" data-t="cta_note"></span>
   </section>
 
@@ -134,26 +132,48 @@ footer p{font-size:13px;color:var(--ink3);}
     </div>
   </section>
 
-  <!-- VIDEO — 隐藏中，待补演示视频（见 .pending-asset 注释） -->
-  <section class="pending-asset">
-    <h2 class="sec-title" data-t="video_h"></h2>
-    <div class="video-slot">{{VIDEO_EMBED}}</div>
-  </section>
-
-  <!-- SCREENSHOTS — 隐藏中，待补真机截图（见 .pending-asset 注释） -->
-  <section class="pending-asset">
-    <h2 class="sec-title" data-t="shots_h"></h2>
-    <div class="shots">
-      <div class="shot">{{SCREENSHOT_1}}</div>
-      <div class="shot">{{SCREENSHOT_2}}</div>
-      <div class="shot">{{SCREENSHOT_3}}</div>
+  <!-- GET STARTED 三步上手 -->
+  <section>
+    <div class="install">
+      <h2 data-t="steps_h"></h2>
+      <div class="step">
+        <span class="step-n">1</span>
+        <span data-t="steps_1"></span>
+      </div>
+      <div class="step">
+        <span class="step-n">2</span>
+        <span data-t="steps_2"></span>
+      </div>
+      <div class="step">
+        <span class="step-n">3</span>
+        <span data-t="steps_3"></span>
+      </div>
     </div>
   </section>
 
-  <!-- INSTALL -->
+  <!-- VIDEO -->
+  <section>
+    <h2 class="sec-title" data-t="video_h"></h2>
+    <div class="video-slot">
+      <video src="demo-dash.mp4" autoplay muted loop playsinline poster="shot-checkout.jpg"></video>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section>
+    <h2 class="sec-title" data-t="shots_h"></h2>
+    <div class="shots">
+      <img class="shot" src="shot-checkout.jpg" loading="lazy" alt="Supermarket Dash checkout — prices and shelf life filled in with a few taps"/>
+      <img class="shot" src="shot-pantry.jpg" loading="lazy" alt="Pantry overview — items grouped by category with freshness status"/>
+      <img class="shot" src="shot-recipe.jpg" loading="lazy" alt="Recipe card — cook suggestions based on what's expiring"/>
+    </div>
+  </section>
+
+  <!-- INSTALL：iOS / Android 双子区 -->
   <section>
     <div class="install">
       <h2 data-t="install_h"></h2>
+      <h3 data-t="install_ios_h" style="font-size:15px;font-weight:600;color:var(--ink);margin:0 0 14px;"></h3>
       <div class="step">
         <span class="step-n">1</span>
         <span>
@@ -170,18 +190,33 @@ footer p{font-size:13px;color:var(--ink3);}
         <span class="step-n">3</span>
         <span data-t="install_3"></span>
       </div>
+      <h3 data-t="install_and_h" style="font-size:15px;font-weight:600;color:var(--ink);margin:24px 0 14px;padding-top:20px;border-top:1px solid var(--line);"></h3>
+      <div class="step">
+        <span class="step-n">1</span>
+        <span data-t="install_and_1"></span>
+      </div>
+      <div class="step">
+        <span class="step-n">2</span>
+        <span data-t="install_and_2"></span>
+      </div>
+      <div class="step">
+        <span class="step-n">3</span>
+        <span data-t="install_and_3"></span>
+      </div>
     </div>
   </section>
 
   <!-- CTA REPEAT -->
   <section style="text-align:center;padding-top:8px;">
-    <a class="cta" href="{{GUMROAD_URL}}" data-t="cta"></a>
+    <a class="cta" href="/?start=dash" data-t="cta"></a>
   </section>
 
 </div>
 
 <footer>
   <span class="brand">Funtry</span>
+  <!-- {{GUMROAD_URL}}: 部署前由 Funfun 手动替换为实际 Gumroad 链接 -->
+  <p style="margin-bottom:8px;"><a href="{{GUMROAD_URL}}" data-t="footer_support" style="color:var(--ink3);font-size:13px;text-decoration:underline;"></a></p>
   <p data-t="footer"></p>
 </footer>
 
@@ -190,8 +225,8 @@ var DICT = {
   en: {
     hero_h1: 'Your pantry, finally under control.',
     hero_sub: "Tap, don't type. Track what's in your kitchen in minutes — no accounts, no subscriptions, your data stays on your phone.",
-    cta: 'Get Funtry — Free',
-    cta_note: 'Works in your browser · Add to Home Screen for the full app',
+    cta: 'Start Free',
+    cta_note: 'Core features free · No account, no subscription',
     pain_h: "Don't let fresh food perish in the fuss.",
     pain_p: 'Tracking your kitchen should be quick — even fun. Funtry turns logging into a few playful taps, so fresh food gets eaten, not forgotten behind a chore you keep dodging.',
     pain_kick: 'Less fuss. More fun. Nothing wasted.',
@@ -201,20 +236,30 @@ var DICT = {
     f2_p: 'Only nudges you about food that genuinely needs attention, so notifications stay meaningful.',
     f3_h: 'Private by design',
     f3_p: 'No account, no cloud. Everything lives on your device and exports to a file whenever you want.',
+    steps_h: 'Get started in 3 steps',
+    steps_1: 'Open funtry.app and hit "Start Free"',
+    steps_2: 'Play a Supermarket Dash — stock your whole pantry in minutes, just by tapping',
+    steps_3: 'Add to Home Screen — your data stays safe on your phone, and it works like a real app',
     video_h: 'See it in action',
     shots_h: 'A peek inside',
-    install_h: 'Install on iPhone',
+    install_h: 'Install as an app',
+    install_ios_h: 'On iPhone (Safari)',
+    install_and_h: 'On Android (Chrome)',
+    install_and_1: 'Open funtry.app in Chrome',
+    install_and_2: 'Tap the ⋮ menu → "Add to Home screen" (or "Install app")',
+    install_and_3: 'Open Funtry from your home screen',
     install_1a: 'Tap the Share button',
     install_1b: 'at the bottom of Safari',
     install_2: 'Scroll down and choose "Add to Home Screen"',
     install_3: 'Open Funtry from your home screen — it runs full-screen like a real app',
     footer: 'Made with care · Your data stays yours.',
+    footer_support: 'Support the project — pay what you want ❤️',
   },
   zh: {
     hero_h1: '你的食材库，终于井井有条。',
     hero_sub: '点一点，不用打字。几分钟就能记好厨房里有什么——无需账号、无需订阅，数据只存在你的手机上。',
-    cta: '免费使用趣囤',
-    cta_note: '浏览器即可使用 · 添加到主屏幕获得完整 App 体验',
+    cta: '免费开始',
+    cta_note: '核心功能免费 · 无需账号、无需订阅',
     pain_h: '别让新鲜食材，败给一堆瞎折腾。',
     pain_p: '管理厨房，该是件麻利、甚至有点好玩的事。趣囤把记录变成几下轻快的点击——让新鲜食材被吃掉，而不是遗忘在你一直躲着的琐事背后。',
     pain_kick: '少点折腾，多点乐趣，不浪费一口。',
@@ -224,14 +269,24 @@ var DICT = {
     f2_p: '只提醒真正需要关注的食材，让每一条通知都有意义。',
     f3_h: '隐私优先设计',
     f3_p: '无账号、无云端。一切都存在你的设备上，随时可导出成文件。',
+    steps_h: '三步上手',
+    steps_1: '打开 funtry.app，点「免费开始」',
+    steps_2: '来一局超市大作战——只靠点选，几分钟囤完全部库存',
+    steps_3: '添加到主屏幕——数据安全存在手机里，像真正的 App 一样使用',
     video_h: '看它如何运作',
     shots_h: '抢先一览',
-    install_h: '在 iPhone 上安装',
+    install_h: '安装为 App',
+    install_ios_h: 'iPhone（Safari）',
+    install_and_h: 'Android（Chrome）',
+    install_and_1: '用 Chrome 打开 funtry.app',
+    install_and_2: '点右上角 ⋮ 菜单 →「添加到主屏幕」（或「安装应用」）',
+    install_and_3: '从主屏幕打开 Funtry',
     install_1a: '点击 Safari 底部的',
     install_1b: '分享按钮',
     install_2: '向下滑动，选择「添加到主屏幕」',
     install_3: '从主屏幕打开 Funtry——它会像真正的 App 一样全屏运行',
     footer: '用心打造 · 你的数据始终属于你。',
+    footer_support: '支持这个项目——随心付 ❤️',
   }
 };
 
@@ -258,5 +313,6 @@ function setLang(l) {
 applyLang();
 </script>
 
+<!-- 统计：funtry.app 走 Cloudflare 代理，Web Analytics 自动注入 beacon，无需手动脚本 -->
 </body>
 </html>
