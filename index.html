@@ -5793,7 +5793,7 @@ function redeemSupporterKey() {
   var input = document.getElementById('sup-input');
   var err = document.getElementById('sup-err');
   var v = (input.value || '').trim();
-  if (!/^[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}-[0-9A-F]{8}$/i.test(v)) {
+  if (!/^[0-9A-Z]{8}-[0-9A-Z]{8}-[0-9A-Z]{8}-[0-9A-Z]{8}$/i.test(v)) {
     err.textContent = tx('sup_err');
     err.style.display = 'block';
     return;
