@@ -2758,10 +2758,9 @@ function renderPantry() {
   var CM = getCM();
   var q = (document.getElementById('search-input').value || '').toLowerCase();
   var list = items.filter(function(i){ return i.name.toLowerCase().indexOf(q) >= 0 || (i.nameEn && i.nameEn.toLowerCase().indexOf(q) >= 0); });
-  var cnt = {all:items.length, ok:0, soon:0, urg:0, exp:0, out:0};
+  var cnt = {all:items.length, ok:0, soon:0, urg:0, exp:0};
   items.forEach(function(i) {
     var s = getStatus(i); if (cnt[s] !== undefined) cnt[s]++;
-    if (i.qty !== null && i.qty !== undefined && i.qty !== '' && parseFloat(i.qty) === 0) cnt.out++;
   });
   var tagDefs = [
     {id:'all', l:tx('fi_all'), cls:'f-all'},
@@ -2769,7 +2768,6 @@ function renderPantry() {
     {id:'soon',l:tx('fi_soon'),cls:'f-soon', dot:SC.soon},
     {id:'urg', l:tx('fi_urg'), cls:'f-urg',  dot:SC.urg},
     {id:'exp', l:tx('fi_exp'), cls:'f-exp',  dot:SC.exp},
-    {id:'out', l:tx('fi_out'), cls:'f-out'},
   ];
   document.getElementById('filter-tags').innerHTML = tagDefs.map(function(t) {
     return '<div class="ftag ' + t.cls + (currentFilter===t.id?' on':'') + '" onclick="setFilter(\'' + t.id + '\')">'
@@ -2778,8 +2776,7 @@ function renderPantry() {
   }).join('');
 
   if (currentFilter !== 'all') {
-    if (currentFilter === 'out') list = list.filter(function(i){ return parseFloat(i.qty) === 0; });
-    else list = list.filter(function(i){ return getStatus(i) === currentFilter; });
+    list = list.filter(function(i){ return getStatus(i) === currentFilter; });
   }
   list.sort(function(a,b) {
     var ord = {exp:0,urg:1,soon:2,ok:3,nd:4};
