@@ -39,6 +39,11 @@ nav{flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;background:var(--ca
 .lang-btn.on{background:var(--ink);color:#fff;}
 
 .data-btn{width:32px;height:32px;border-radius:50%;background:var(--coral);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:8px;transition:transform .15s,opacity .15s;}
+@keyframes helpPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,107,60,.55)}50%{box-shadow:0 0 0 7px rgba(201,107,60,0)}}
+.data-btn.help-pulse{animation:helpPulse 1.4s ease-out infinite;}
+#help-coach{display:none;position:fixed;z-index:340;max-width:240px;background:var(--ink);color:#fff;font-size:12.5px;line-height:1.5;padding:9px 12px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer;}
+#help-coach.on{display:block;}
+#help-coach::after{content:'';position:absolute;top:-5px;right:13px;width:10px;height:10px;background:var(--ink);transform:rotate(45deg);}
 .data-btn:active{transform:scale(.92);}
 .stat-cards{display:flex;gap:10px;margin:14px 0;}
 .stat-card{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:var(--rsm);padding:12px 8px;text-align:center;}
@@ -542,6 +547,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .rs-empty-ico{font-size:40px;}
 .rs-sec-title{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin:14px 2px 8px;}
 .rs-sec-title:first-child{margin-top:0;}
+.rs-freq-hint{font-size:11px;color:var(--ink3);margin:-4px 2px 8px;line-height:1.5;}
 .rs-mini-empty{font-size:12px;color:var(--ink3);text-align:center;padding:8px 0 6px;}
 .rs-buy-item{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--rsm);padding:8px 10px;transition:border-color .12s,background .12s;}
 .rs-buy-item.on{background:#FFF3ED;border-color:var(--coral);}
@@ -714,7 +720,11 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
     </div>
     <button class="data-btn" onclick="openStatsModal()" title="本月统计" style="background:var(--green);">📊</button>
     <button class="data-btn" onclick="openDataModal()" title="数据管理">💾</button>
+    <button class="data-btn" id="help-btn" onclick="openHelpModal()" title="关于 & 帮助" style="font-weight:700;font-size:16px;">?</button>
   </div>
+
+  <!-- 首次引导气泡：指向右上角 ? 图标（点一下或几秒后消失，记 localStorage 不再出现） -->
+  <div id="help-coach" onclick="openHelpModal()"><span id="help-coach-text"></span></div>
 
   <!-- PANTRY PAGE -->
   <div class="pg on" id="pg-p">
@@ -993,6 +1003,30 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
   </div>
 </div>
 
+<!-- ABOUT & HELP MODAL -->
+<div class="modal-overlay" id="help-modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div>
+        <div class="modal-title" id="help-title">关于 & 帮助</div>
+        <div class="modal-sub" id="help-ver" style="margin-bottom:0;"></div>
+      </div>
+      <button class="ap-close" onclick="closeHelpModal()" style="position:absolute;right:16px;top:16px;"></button>
+    </div>
+    <div style="background:var(--bg);border-radius:var(--rsm);padding:14px;margin-bottom:14px;">
+      <div id="help-pro-title" style="font-size:14px;font-weight:600;margin-bottom:8px;">✨ Pro 功能</div>
+      <ul id="help-pro-list" style="margin:0 0 12px;padding-left:18px;font-size:13px;color:var(--ink2);line-height:1.9;"></ul>
+      <button id="help-pro-btn" onclick="closeHelpModal();openProUnlock();" style="width:100%;background:var(--amber);color:#fff;border:none;border-radius:var(--rsm);padding:11px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;"></button>
+    </div>
+    <div style="text-align:center;margin-bottom:14px;">
+      <a id="help-fb-link" href="mailto:feedback@funtry.app?subject=Funtry%20Feedback" style="font-size:13px;color:var(--ink2);text-decoration:underline;"></a>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="help-close-btn" onclick="closeHelpModal()"></button>
+    </div>
+  </div>
+</div>
+
 <!-- DATA MANAGEMENT MODAL -->
 <div class="modal-overlay" id="data-modal">
   <div class="modal-box">
@@ -1025,10 +1059,6 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
         <div id="sup-err" style="display:none;font-size:12px;color:var(--coral);margin-top:6px;"></div>
       </div>
       <div id="sup-badge" style="display:none;background:#FFF3ED;border:1.5px solid var(--amber);border-radius:var(--rsm);padding:12px;text-align:center;font-size:14px;font-weight:500;color:var(--ink);"></div>
-    </div>
-    <!-- feedback@funtry.app 经 Cloudflare Email Routing 转发到真实邮箱 -->
-    <div style="text-align:center;margin-bottom:14px;">
-      <a id="fb-link" href="mailto:feedback@funtry.app?subject=Funtry%20Feedback" style="font-size:12px;color:var(--ink3);text-decoration:underline;">有问题或建议？发邮件给我们</a>
     </div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeDataModal()">关闭</button>
@@ -1368,6 +1398,7 @@ var DICT = {
     rs_buy_ph_qty:'数量',
     rs_buy_ph_price:'价格',
     rs_suggest_title:'建议加入常买',
+    rs_freq_hint:'💡 在库存列表点食材右侧的 ⭐ 即可加入常买',
     rs_suggest_add:'+ 加入常买',
     battle_cs_title:'添加自定义食材',battle_cs_lbl_name:'食材名称',
     battle_cs_ph_name:'如：板栗、火龙果…',battle_cs_lbl_cat:'分区',
@@ -1424,6 +1455,11 @@ var DICT = {
     battle_subtitle:'纯粹好玩，超时也没关系 😄',
     battery_tip:'点电池标记用量 · 点 ✕ 标记用完',
     fb_link:'有问题或建议？发邮件给我们',
+    help_title:'关于 & 帮助',
+    help_pro_title:'✨ Pro 功能',
+    help_pro_items:['多月消费趋势','分类浪费分析','累计用掉 · 物尽其用','建议加入常买','复购 & 浪费提醒'],
+    help_pro_on:'✅ 已解锁 Pro',
+    help_coach:'想看 Pro 功能 · 联系我们？点这里 👆',
     sup_title:'❤️ 早期支持者',
     sup_desc:'购买 Funtry 后会收到解锁码，在这里输入即可点亮支持者徽章',
     sup_btn:'解锁',
@@ -1623,6 +1659,7 @@ var DICT = {
     rs_buy_ph_qty:'Qty',
     rs_buy_ph_price:'Price',
     rs_suggest_title:'Suggested regulars',
+    rs_freq_hint:'💡 Tap the ⭐ on any pantry item to add it here',
     rs_suggest_add:'+ Add',
     battle_cs_title:'Add Custom Item',battle_cs_lbl_name:'Item name',
     battle_cs_ph_name:'e.g. Jackfruit, Chestnuts…',battle_cs_lbl_cat:'Category',
@@ -1679,6 +1716,11 @@ var DICT = {
     battle_subtitle:'just for fun — no rush 😄',
     battery_tip:'Tap battery to track usage · tap ✕ when done',
     fb_link:'Questions or feedback? Email us',
+    help_title:'About & Help',
+    help_pro_title:'✨ Pro features',
+    help_pro_items:['Multi-month spending trends','Waste breakdown by category','Total used · nothing wasted','Suggested regulars','Repurchase & waste reminders'],
+    help_pro_on:'✅ Pro unlocked',
+    help_coach:'Pro features · contact us — tap here 👆',
     sup_title:'❤️ Early Supporter',
     sup_desc:'Got an unlock code with your purchase? Enter it here to light up your supporter badge',
     sup_btn:'Unlock',
@@ -1832,7 +1874,6 @@ function applyLang() {
     var did = document.getElementById('data-import-desc');  if (did) did.textContent = tx('data_import_desc');
     var dib = document.getElementById('data-import-btn');   if (dib) dib.textContent = tx('data_import_btn');
     var dcb = dm.querySelector('.modal-cancel'); if (dcb) dcb.textContent = tx('data_close');
-    var dfb = document.getElementById('fb-link'); if (dfb) dfb.textContent = tx('fb_link');
     renderSupporterSection();
   }
   // pantry action bar
@@ -3206,6 +3247,59 @@ function checkProHooks() {
     + '<button class="pro-hook-btn" onclick="openProUnlock()">' + tx('pro_unlock_btn') + '</button></div>';
 }
 function openProUnlock() { openDataModal(); }
+
+// ── 关于 & 帮助面板 ───────────────────────────────────────────
+var APP_VERSION = 'v1.0';
+function openHelpModal() {
+  dismissHelpCoach();  // 用户已找到入口，引导气泡即时收起并不再出现
+  document.getElementById('help-title').textContent = tx('help_title');
+  document.getElementById('help-ver').textContent   = 'Funtry · ' + APP_VERSION;
+  document.getElementById('help-pro-title').textContent = tx('help_pro_title');
+  document.getElementById('help-pro-list').innerHTML =
+    tx('help_pro_items').map(function(t){ return '<li>' + t + '</li>'; }).join('');
+  document.getElementById('help-pro-btn').textContent =
+    isProUnlocked() ? tx('help_pro_on') : tx('pro_unlock_btn');
+  document.getElementById('help-pro-btn').style.display = isProUnlocked() ? 'none' : '';
+  document.getElementById('help-fb-link').textContent = tx('fb_link');
+  document.getElementById('help-close-btn').textContent = tx('data_close');
+  document.getElementById('help-modal').classList.add('on');
+}
+function closeHelpModal() {
+  document.getElementById('help-modal').classList.remove('on');
+}
+
+// 首次引导气泡：指向 ? 图标，点一下/几秒后消失，只出现一次
+var _helpCoachTimer = null, _helpCoachTries = 0;
+function showHelpCoach() {
+  var btn = document.getElementById('help-btn');
+  var bubble = document.getElementById('help-coach');
+  if (!btn || !bubble) return;
+  document.getElementById('help-coach-text').textContent = tx('help_coach');
+  var r = btn.getBoundingClientRect();
+  bubble.style.top = (r.bottom + 9) + 'px';
+  bubble.style.right = Math.max(8, window.innerWidth - r.right) + 'px'; // 右缘对齐到 ? 按钮
+  bubble.classList.add('on');
+  btn.classList.add('help-pulse');
+  clearTimeout(_helpCoachTimer);
+  _helpCoachTimer = setTimeout(dismissHelpCoach, 6500);
+}
+function dismissHelpCoach() {
+  var bubble = document.getElementById('help-coach');
+  var btn = document.getElementById('help-btn');
+  if (bubble) bubble.classList.remove('on');
+  if (btn) btn.classList.remove('help-pulse');
+  localStorage.setItem('funtry_help_coached', '1');
+  clearTimeout(_helpCoachTimer);
+}
+function maybeShowHelpCoach() {
+  if (localStorage.getItem('funtry_help_coached') === '1') return;
+  var welcome = document.getElementById('welcome-overlay');
+  var battle = document.getElementById('battle-modal');
+  var busy = (welcome && welcome.style.display === 'flex')
+          || (battle && battle.classList.contains('on'));
+  if (busy) { if (_helpCoachTries++ < 40) setTimeout(maybeShowHelpCoach, 1200); return; }
+  setTimeout(showHelpCoach, 400); // 等布局稳定（迁移横幅可能改变 ? 的位置）再定位
+}
 function requestNotifPerm() {
   localStorage.setItem('pantry_v9_notif_asked', '1');
   document.getElementById('notif-ask-bar').classList.remove('on');
@@ -6105,6 +6199,7 @@ function renderRestock() {
 
   // ── 常买区（⭐ 收藏的常备品，勾选确认补货） ──
   html += '<div class="rs-sec-title">' + tx('rs_sec_frequent') + '</div>';
+  html += '<div class="rs-freq-hint">' + tx('rs_freq_hint') + '</div>';
   if (!frequentItems.length) {
     html += '<div class="rs-mini-empty">' + tx('rs_empty').replace('\n','<br/>') + '</div>';
   } else {
@@ -6653,6 +6748,7 @@ if (_startParams.get('start') === 'dash') {
 }
 checkAndFireNotif();
 maybeShowA2hsBanner();  // 底部「添加到桌面」提示条（非独立模式、未关闭时）
+maybeShowHelpCoach();   // 首次引导气泡，指向右上角 ? 图标（只出现一次）
 
 // ── 14. 输入框聚焦时滚动到视口上部,避免被 iOS QuickType 工具栏和键盘遮挡 ──
 // 同时全局兜底:禁止 iOS 的"自动填充联系人"提示(给所有输入框补齐 autocomplete=off 等属性)
