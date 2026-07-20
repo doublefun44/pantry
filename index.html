@@ -3728,9 +3728,27 @@ function refreshA2hsBannerText() {
   document.getElementById('a2hs-banner-ios').textContent     = tx('a2hs_banner_ios');
   document.getElementById('a2hs-banner-android').textContent = tx('a2hs_banner_android');
 }
+// 关闭后不是永久沉默：第 1 次关闭 → 隔 1 天再提醒一次；第 2 次关闭 → 隔 14 天再提醒一次；
+// 第 3 次关闭才彻底不再打扰（怕用户手滑关错，给两次补救机会）。
+// 存储：{count: 已关闭次数, at: 最近一次关闭的时间戳}
+function getA2hsDismiss() {
+  try {
+    var d = JSON.parse(localStorage.getItem('funtry_a2hs_dismiss'));
+    if (d && typeof d.count === 'number' && typeof d.at === 'number') return d;
+  } catch (e) {}
+  // 兼容旧版永久关闭标记：迁移为"刚刚关闭过一次"，从今天起重新进入 1 天/14 天的提醒节奏
+  if (localStorage.getItem('funtry_a2hs_dismissed') === 'true') return { count: 1, at: Date.now() };
+  return null;
+}
+function a2hsShouldShow(d) {
+  if (!d) return true;
+  if (d.count >= 3) return false;
+  var gapDays = d.count >= 2 ? 14 : 1;
+  return (Date.now() - d.at) >= gapDays * 86400000;
+}
 function maybeShowA2hsBanner() {
   if (isStandalone()) return;
-  if (localStorage.getItem('funtry_a2hs_dismissed') === 'true') return; // 只认新横幅自己的 × 关闭标记
+  if (!a2hsShouldShow(getA2hsDismiss())) return;
   refreshA2hsBannerText();
   document.getElementById('a2hs-banner').classList.add('on');
 }
@@ -3738,13 +3756,16 @@ function toggleA2hsSteps() {
   document.getElementById('a2hs-banner-steps').classList.toggle('on');
 }
 function dismissA2hsBanner() {
-  localStorage.setItem('funtry_a2hs_dismissed', 'true');
+  var prev = getA2hsDismiss();
+  var count = (prev ? prev.count : 0) + 1;
+  localStorage.setItem('funtry_a2hs_dismiss', JSON.stringify({ count: count, at: Date.now() }));
+  localStorage.removeItem('funtry_a2hs_dismissed'); // 旧标记已迁移，清掉避免和新逻辑打架
   document.getElementById('a2hs-banner').classList.remove('on');
 }
 
 function maybeShowA2HS() {
   if (isStandalone()) return;
-  if (localStorage.getItem('funtry_a2hs_dismissed') === 'true') return;  // 底部提示条已处理
+  if (!a2hsShouldShow(getA2hsDismiss())) return;  // 底部提示条已处理（或仍在冷却期）
   var _bn = document.getElementById('a2hs-banner');
   if (_bn && _bn.classList.contains('on')) return;                       // 提示条正在显示，别再弹模态
   var s = localStorage.getItem('pantry_a2hs_shown');
