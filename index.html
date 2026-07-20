@@ -1258,7 +1258,7 @@ var DICT = {
     tab_preset:'📋 从预置库',tab_manual:'✏️ 手动输入',
     preset_add:'添加选中',preset_add_n:function(n){return '添加选中 ('+n+')';},
     pcat_all:'全部',
-    zone_urgent:'需要注意',zone_low:'快没了',zone_rest:'其他食材',low_mark:'切换库存状态',
+    zone_urgent:'需要注意',zone_low:'快没了',zone_rest:'其他食材',low_mark:'点一下记一次消耗',
     ob_title:'欢迎使用 Funtry',ob_sub:'勾选家里通常备有的食材，2 分钟建立初始库存',
     ob_count:function(n){return '已选 '+n+' 个食材';},ob_zero:'点击食材勾选',
     ob_skip:'跳过',ob_done:'进入趣囤 →',
@@ -1345,6 +1345,8 @@ var DICT = {
     meal_toast:function(n,f){return '已记录 '+n+' 样消耗'+(f>0?'，其中 '+f+' 样已用完移出':'');},
     stock_lv0:'🔋 满格', stock_lv1:'🔶 还剩一半', stock_lv2:'🪫 快用完',
     stock_toast:function(name,lvl){return '「'+name+'」标为 '+lvl;},
+    stock_used_amt:function(a){return '，用掉 $'+a+' 计入本月';},
+    stock_at_min:function(name){return '「'+name+'」已到最后一格，点 × 用掉剩余';},
     stock_moved_low:'，已移到「快没了」区',
     stock_moved_back:'，已回到「其他食材」',
     rs_title_a:'日常',rs_title_b:'补货',
@@ -1511,7 +1513,7 @@ var DICT = {
     tab_preset:'📋 Preset List',tab_manual:'✏️ Manual',
     preset_add:'Add selected',preset_add_n:function(n){return 'Add selected ('+n+')';},
     pcat_all:'All',
-    zone_urgent:'Needs Attention',zone_low:'Running Low',zone_rest:'In Stock',low_mark:'Toggle stock level',
+    zone_urgent:'Needs Attention',zone_low:'Running Low',zone_rest:'In Stock',low_mark:'Tap to log a use',
     ob_title:'Welcome to Funtry',ob_sub:'Check what you usually keep at home — takes ~2 min',
     ob_count:function(n){return n+' items selected';},ob_zero:'Tap items to select',
     ob_skip:'Skip',ob_done:'Enter Funtry →',
@@ -1598,6 +1600,8 @@ var DICT = {
     meal_toast:function(n,f){return 'Logged '+n+(n===1?' item':' items')+(f>0?', '+f+' used up & removed':'');},
     stock_lv0:'🔋 full', stock_lv1:'🔶 half left', stock_lv2:'🪫 almost out',
     stock_toast:function(name,lvl){return '"'+name+'" marked '+lvl;},
+    stock_used_amt:function(a){return ' — $'+a+' logged to Used';},
+    stock_at_min:function(name){return '"'+name+'" is on its last bar — tap × to use the rest';},
     stock_moved_low:' — moved to “Running Low”',
     stock_moved_back:' — back in “In Stock”',
     rs_title_a:'Restock ',rs_title_b:'List',
@@ -2435,7 +2439,10 @@ function confirmMealLog() {
       if (mealHasQty(it)) {
         it.qty = Math.max(0, Math.round((extractQtyNumber(it.qty) - sel.useQty) * 1000) / 1000);
       } else {
-        it.stockLevel = Math.min(2, getStockLevel(it) + 1);
+        var _from = getStockLevel(it), _to = Math.min(2, _from + 1);
+        var _lid = recordStockStep(it, _from, _to); // 做饭消耗一格 → 计入「用掉」
+        if (_lid) ledgerIds.push(_lid);
+        it.stockLevel = _to;
         it.low = false;
       }
     }
@@ -2501,8 +2508,17 @@ function saveItems() { try { localStorage.setItem('pantry_v9_i', JSON.stringify(
 // 事件: { id, t(时间戳), type: 'buy'|'use'|'waste', name, presetId, amount }
 var ledger = [];
 try { ledger = JSON.parse(localStorage.getItem('pantry_ledger')) || []; } catch(e) { ledger = []; }
-// 扔过期食材时按电池剩余比例折算浪费金额：满=100% 偏低=50% 很低=25%
+// 电池剩余比例：满=100% 偏低=50% 很低=25%
 var BATTERY_REMAIN = { 0: 1.0, 1: 0.5, 2: 0.25 };
+// 电池累计已消耗比例（与 BATTERY_REMAIN 互补）：满=0% 点一下=50% 再点=75%
+var STOCK_CONSUMED = { 0: 0, 1: 0.5, 2: 0.75 };
+// 电池前进一格（from→to）时，把这一步的消耗按单价折算记入「用掉」，返回账本 id（供撤销）
+function recordStockStep(it, from, to) {
+  var price = it.price || 0;
+  var frac = (STOCK_CONSUMED[to] || 0) - (STOCK_CONSUMED[from] || 0);
+  if (price <= 0 || frac <= 0) return null;
+  return addLedger('use', it.name, it.presetId, price * frac);
+}
 // 电池加权金额：满格×1、橙(l1)×0.5、红(l2)×0.25
 function weightedValue(it) {
   var r = BATTERY_REMAIN[getStockLevel(it)];
@@ -2524,17 +2540,14 @@ function removeLedger(ids) {
   saveLedger();
 }
 // 记录食材离开库存的金额事件，返回事件 id 数组（供撤销回滚）
+// 食材离开库存时，只结算「电池里还剩的部分」——已消耗的那部分在点电池时就已入账。
+// 点 × 用掉：剩余记「用掉」；过期扔掉：剩余记「浪费」。没点过电池（满格）时剩余=100%。
 function recordExit(item, reason) {
   var price = item.price || 0;
   if (price <= 0) return [];
-  if (reason === 'waste') {
-    var r = BATTERY_REMAIN[getStockLevel(item)]; if (r === undefined) r = 1;
-    var ids = [];
-    var w = addLedger('waste', item.name, item.presetId, price * r); if (w) ids.push(w);
-    var u = addLedger('use',   item.name, item.presetId, price * (1 - r)); if (u) ids.push(u);
-    return ids;
-  }
-  var id = addLedger('use', item.name, item.presetId, price);
+  var r = BATTERY_REMAIN[getStockLevel(item)]; if (r === undefined) r = 1;
+  var type = reason === 'waste' ? 'waste' : 'use';
+  var id = addLedger(type, item.name, item.presetId, price * r);
   return id ? [id] : [];
 }
 function saveMeals() { try { localStorage.setItem('pantry_v9_m', JSON.stringify(meals)); } catch(e) {} }
@@ -2689,17 +2702,22 @@ function cycleStockLevel(id) {
   var it = items.find(function(i){ return i.id === id; });
   if (!it) return;
   var prev = getStockLevel(it);
-  it.stockLevel = (prev + 1) % 3;
+  if (prev >= 2) {                          // 已到最后一格：电池不再前进，剩余请点 × 用掉
+    showUndoToast({ mode: 'info', msg: txf('stock_at_min', itemDisplayName(it)) });
+    return;
+  }
+  var next = prev + 1;
+  it.stockLevel = next;
   it.low = false; // 清除旧字段避免干扰
+  var lid = recordStockStep(it, prev, next); // 本步消耗计入「用掉」（按当前时间→归入当月）
   saveItems();
   // 原地更新电池图标，不立刻重排
   var wrap = document.querySelector('.row-wrap[data-id="' + id + '"]');
   if (wrap) {
     var btn = wrap.querySelector('.low-btn');
     if (btn) {
-      var lv = it.stockLevel;
-      btn.className = 'low-btn' + (lv===1?' l1':lv===2?' l2':'');
-      btn.innerHTML = buildBatteryIcon(lv);
+      btn.className = 'low-btn' + (next===1?' l1':' l2');
+      btn.innerHTML = buildBatteryIcon(next);
     }
   }
   // 换了目标食材：先把上一个的归位结算掉
@@ -2708,7 +2726,8 @@ function cycleStockLevel(id) {
     finalizeStockCycle();
   }
   if (stockCycleCtx) clearTimeout(stockCycleCtx.timer);
-  else stockCycleCtx = { id: id, fromLevel: prev };
+  else stockCycleCtx = { id: id, fromLevel: prev, ledgerIds: [] };
+  if (lid) stockCycleCtx.ledgerIds.push(lid);
   stockCycleCtx.timer = setTimeout(finalizeStockCycle, 900);
 }
 function finalizeStockCycle() {
@@ -2724,12 +2743,15 @@ function finalizeStockCycle() {
     setTimeout(function(){ wrap.classList.remove('just-moved'); }, 1600);
   }
   var msg = txf('stock_toast', itemDisplayName(it), tx(lv===0?'stock_lv0':lv===1?'stock_lv1':'stock_lv2'));
+  // 本次累计计入「用掉」的金额
+  var amt = (it.price || 0) * ((STOCK_CONSUMED[lv]||0) - (STOCK_CONSUMED[ctx.fromLevel]||0));
+  if (amt > 0) msg += txf('stock_used_amt', amt.toFixed(2));
   var s = getStatus(it);
   var urgent = s==='exp' || s==='urg' || s==='soon';
   if (currentFilter === 'all' && !urgent && ((ctx.fromLevel>0) !== (lv>0))) {
     msg += tx(lv>0 ? 'stock_moved_low' : 'stock_moved_back');
   }
-  showUndoToast({ mode: 'info', msg: msg });
+  showUndoToast({ mode: 'stock', msg: msg, itemId: ctx.id, fromLevel: ctx.fromLevel, ledgerIds: ctx.ledgerIds });
 }
 
 function renderPantry() {
@@ -4358,7 +4380,7 @@ function showUndoToast(ctx) {
     msg.textContent = ctx.count > 1 ? txf('done_toast_n', ctx.count) : txf('done_toast', ctx.name);
   } else if (ctx.mode === 'meal') {
     msg.textContent = txf('meal_toast', ctx.count, ctx.finCount);
-  } else if (ctx.mode === 'info') {
+  } else if (ctx.mode === 'info' || ctx.mode === 'stock') {
     msg.textContent = ctx.msg;
   } else {
     var qStr = (ctx.delta % 1 === 0) ? String(ctx.delta) : ctx.delta.toFixed(1);
@@ -4406,6 +4428,11 @@ function undoQuickConsume() {
     undoToastCtx.snapshots.forEach(function(snap) { items.push(snap); });
     removeLedger(undoToastCtx.ledgerIds);
     saveItems(); renderPantry(); renderRecipes();
+  } else if (undoToastCtx.mode === 'stock') {
+    var sit = findItem(undoToastCtx.itemId);
+    if (sit) { sit.stockLevel = undoToastCtx.fromLevel; sit.low = false; }
+    removeLedger(undoToastCtx.ledgerIds);   // 撤回本次点电池计入「用掉」的金额
+    saveItems(); renderPantry();
   } else {
     var it = findItem(undoToastCtx.itemId);
     if (it) {
