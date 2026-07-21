@@ -1052,6 +1052,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       <div id="sup-locked">
         <div id="sup-title" style="font-size:14px;font-weight:500;margin-bottom:8px;">❤️ 早期支持者</div>
         <div id="sup-desc" style="font-size:12px;color:var(--ink3);margin-bottom:12px;">购买 Funtry 后会收到解锁码，在这里输入即可点亮支持者徽章</div>
+        <a id="sup-link" href="https://doublefun8.gumroad.com/l/funtry" target="_blank" rel="noopener" style="display:inline-block;font-size:12px;color:var(--ink3);margin-bottom:10px;text-decoration:underline;"></a>
         <div style="display:flex;gap:8px;">
           <input id="sup-input" class="fi" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" autocapitalize="characters" autocomplete="off" spellcheck="false" style="flex:1;font-size:13px;"/>
           <button id="sup-btn" onclick="redeemSupporterKey()" style="background:var(--amber);color:#fff;border:none;border-radius:var(--rsm);padding:0 18px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;">解锁</button>
@@ -1465,6 +1466,7 @@ var DICT = {
     sup_btn:'解锁',
     sup_err:'解锁码格式不对，请检查后重试',
     sup_thanks:'感谢支持！徽章已点亮 ❤️',
+    sup_link:'还没有解锁码？点此获取 →',
     sup_badge:function(d){return '❤️ 早期支持者 · 自 '+d;},
   },
   en: {
@@ -1726,6 +1728,7 @@ var DICT = {
     sup_btn:'Unlock',
     sup_err:'That code doesn’t look right — please check and try again',
     sup_thanks:'Thank you for your support! Badge unlocked ❤️',
+    sup_link:'Don\'t have a code yet? Get one here →',
     sup_badge:function(d){return '❤️ Early Supporter · since '+d;},
   }
 };
@@ -3246,7 +3249,7 @@ function checkProHooks() {
   el.innerHTML = '<div class="pro-hook"><span class="pro-hook-text">' + txt + '</span>'
     + '<button class="pro-hook-btn" onclick="openProUnlock()">' + tx('pro_unlock_btn') + '</button></div>';
 }
-function openProUnlock() { openDataModal(); }
+function openProUnlock() { window.open('https://doublefun8.gumroad.com/l/funtry', '_blank'); }
 
 // ── 关于 & 帮助面板 ───────────────────────────────────────────
 var APP_VERSION = 'v1.0';
@@ -5785,6 +5788,7 @@ function renderSupporterSection() {
     document.getElementById('sup-title').textContent = tx('sup_title');
     document.getElementById('sup-desc').textContent = tx('sup_desc');
     document.getElementById('sup-btn').textContent = tx('sup_btn');
+    document.getElementById('sup-link').textContent = tx('sup_link');
     document.getElementById('sup-err').style.display = 'none';
   }
 }
