@@ -58,6 +58,7 @@ nav{flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;background:var(--ca
 .stat-waste-empty{font-size:12px;color:var(--ink3);text-align:center;padding:10px;}
 .ins-lock{display:flex;align-items:center;gap:8px;background:#F3F0FF;border:1.5px solid #C9BCF5;border-radius:var(--rsm);padding:10px 12px;margin-top:14px;}
 .ins-lock-text{flex:1;font-size:12px;color:var(--ink2);line-height:1.4;}
+.ins-lock-where{font-size:11px;color:var(--ink3);line-height:1.5;margin:6px 2px 0;}
 .ins-saved{text-align:center;margin:16px 0 8px;}
 .ins-saved-val{font-family:'DM Serif Display',serif;font-size:26px;color:var(--green);line-height:1;}
 .ins-saved-sub{font-size:11px;color:var(--ink3);margin-top:3px;}
@@ -1017,6 +1018,7 @@ select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
       <div id="help-pro-title" style="font-size:14px;font-weight:600;margin-bottom:8px;">✨ Pro 功能</div>
       <ul id="help-pro-list" style="margin:0 0 12px;padding-left:18px;font-size:13px;color:var(--ink2);line-height:1.9;"></ul>
       <button id="help-pro-btn" onclick="closeHelpModal();openProUnlock();" style="width:100%;background:var(--amber);color:#fff;border:none;border-radius:var(--rsm);padding:11px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;"></button>
+      <div id="help-pro-where" style="font-size:11.5px;color:var(--ink3);margin-top:9px;line-height:1.5;text-align:center;"></div>
     </div>
     <div style="text-align:center;margin-bottom:14px;">
       <a id="help-fb-link" href="mailto:feedback@funtry.app?subject=Funtry%20Feedback" style="font-size:13px;color:var(--ink2);text-decoration:underline;"></a>
@@ -1236,6 +1238,7 @@ var DICT = {
     stats_fb_high:function(p){return '浪费有点多（'+p+'%），注意及时吃哦';},
     stats_repeat_warn:'这个你常浪费，建议少买或买小份',
     insights_locked:'🔒 解锁 Pro，查看多月趋势、分类浪费、累计用掉',
+    pro_where:'购买后会收到解锁码 → 点顶部 💾 数据管理 输入即可点亮 Pro',
     insights_trend_title:'最近 3 个月（买入 / 用掉 / 浪费）',
     insights_cat_title:'本月分类浪费',
     insights_saved_sub:'累计用掉 · 物尽其用',
@@ -1497,6 +1500,7 @@ var DICT = {
     stats_fb_high:function(p){return 'A bit much wasted ('+p+'%) — try to use food in time';},
     stats_repeat_warn:'You often waste this — buy less or smaller',
     insights_locked:'🔒 Unlock Pro for trends, category waste & total used',
+    pro_where:'You\'ll get a code after purchase → enter it under 💾 (Data) at the top to unlock Pro',
     insights_trend_title:'Last 3 months (bought / used / wasted)',
     insights_cat_title:'Waste by category (this month)',
     insights_saved_sub:'Used in total · money well spent',
@@ -3263,6 +3267,8 @@ function openHelpModal() {
   document.getElementById('help-pro-btn').textContent =
     isProUnlocked() ? tx('help_pro_on') : tx('pro_unlock_btn');
   document.getElementById('help-pro-btn').style.display = isProUnlocked() ? 'none' : '';
+  document.getElementById('help-pro-where').textContent = tx('pro_where');
+  document.getElementById('help-pro-where').style.display = isProUnlocked() ? 'none' : '';
   document.getElementById('help-fb-link').textContent = tx('fb_link');
   document.getElementById('help-close-btn').textContent = tx('data_close');
   document.getElementById('help-modal').classList.add('on');
@@ -5697,7 +5703,8 @@ function renderStats() {
     insEl.innerHTML = isProUnlocked()
       ? renderInsightsHtml()
       : '<div class="ins-lock"><span class="ins-lock-text">' + tx('insights_locked') + '</span>'
-        + '<button class="pro-hook-btn" onclick="openProUnlock()">' + tx('pro_unlock_btn') + '</button></div>';
+        + '<button class="pro-hook-btn" onclick="openProUnlock()">' + tx('pro_unlock_btn') + '</button></div>'
+        + '<div class="ins-lock-where">' + tx('pro_where') + '</div>';
   }
 }
 // 浪费事件归类（presetId → 预设分类；否则按当前库存同名项；都没有归 other）
